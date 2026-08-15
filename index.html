@@ -748,6 +748,10 @@ nav.modes button[aria-selected="true"] em{opacity:.75}
 main{max-width:1560px;margin:0 auto;padding:18px}
 main:has(#m-experience.on){max-width:none}
 section.mode.wide .card{border-radius:10px}
+/* on the Experience tab the page is sized to the viewport, so the only scrollbar
+   is the embedded app's own - no scroll-inside-a-scroll */
+body.exb-fit footer.foot{display:none}
+body.exb-fit main{padding-bottom:0}
 section.mode{display:none}
 section.mode.on{display:block}
 
@@ -757,7 +761,9 @@ section.mode.on{display:block}
 /* One rhythm rule for the whole app: every top-level block inside a page gets the
    same gap. Ad-hoc margin-top/margin-bottom on individual cards is what made the
    spacing look random. */
-section.mode > *{margin:0 0 16px}
+section.mode > *{margin:0 0 16px;min-width:0}
+.grid > *,.split > *,.gauntlet-layout > *,.tape-body > *,.homehero > *,.turf-layout > *{min-width:0}
+.tablewrap{max-width:100%}
 section.mode > *:last-child{margin-bottom:0}
 .split,.grid{margin-bottom:16px}
 .split > .card,.grid > .card{margin:0}
@@ -810,6 +816,7 @@ input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(77,1
 .leaflet-popup-content-wrapper{background:#0F2B46;color:#EAF1F6;border:1px solid rgba(159,182,198,.3);border-radius:8px}
 .leaflet-popup-tip{background:#0F2B46}
 .mk{border-radius:50%;border:2px solid #0A1E31;box-shadow:0 0 0 1px rgba(255,255,255,.25)}
+.atlas-home a{font-size:17px;line-height:26px;font-weight:700;text-align:center;display:block}
 .youpin{width:16px;height:16px;border-radius:50%;background:var(--alert);border:3px solid #fff;box-shadow:0 0 0 4px rgba(242,100,48,.35)}
 
 /* ---------- HOME TURF ---------- */
@@ -1075,17 +1082,17 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
 .endpoint a{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;word-break:break-all;line-height:1.4}
 
 @media (max-width:1150px){
-  .gauntlet-layout,.tape-body{grid-template-columns:1fr}
+  .gauntlet-layout,.tape-body{grid-template-columns:minmax(0,1fr)}
   .gauntlet-layout > .card{position:static !important}
-  #poll-wrap{grid-template-columns:1fr !important}
+  #poll-wrap{grid-template-columns:minmax(0,1fr) !important}
 }
 @media (max-width:1180px){
-  .homehero,.split,.svcrow{grid-template-columns:1fr}
+  .homehero,.split,.svcrow{grid-template-columns:minmax(0,1fr)}
   .hero.big{font-size:38px}
-  .authorrow{grid-template-columns:80px 1fr;gap:14px}
+  .authorrow{grid-template-columns:80px minmax(0,1fr);gap:14px}
   .tglogo{grid-column:1/-1;justify-self:start;max-width:170px}
-  .turf-layout{grid-template-columns:1fr}
-  .tape-head,.tape-picks{grid-template-columns:1fr}
+  .turf-layout{grid-template-columns:minmax(0,1fr)}
+  .tape-head,.tape-picks{grid-template-columns:minmax(0,1fr)}
   .duel{grid-template-columns:70px 1fr 110px 1fr 70px}
 }
 
@@ -1107,10 +1114,10 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
   .tape-side.r{flex-direction:row;text-align:left}
   .verdict{order:3;padding:8px 0}
   .verdictline{font-size:19px}
-  .slate-grid{grid-template-columns:1fr}
+  .slate-grid{grid-template-columns:minmax(0,1fr)}
   .drawer{width:100%}
   footer.foot > div{grid-template-columns:1fr !important;gap:14px}
-  #exb-holder{height:calc(100vh - 130px);min-height:560px}
+  #exb-holder{height:58vh;min-height:380px}
 }
 
 /* ---------- phone ---------- */
@@ -1137,18 +1144,18 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
   .duel .v.l.win::after{content:" \25C0";}
   .pollrow{grid-template-columns:24px 20px 1fr 60px 32px;gap:6px}
   .wkstrip{grid-template-columns:repeat(auto-fill,minmax(88px,1fr))}
-  .qgrid{grid-template-columns:1fr}
+  .qgrid{grid-template-columns:minmax(0,1fr)}
   .gtop{grid-template-columns:1fr 44px 1fr}
   .gteam img{width:28px;height:28px}
   .gteam .s{font-size:13px}
   .filters{gap:6px}
   .filters select,.filters input{flex:1 1 100%;min-width:0}
-  .authorrow{grid-template-columns:64px 1fr}
+  .authorrow{grid-template-columns:64px minmax(0,1fr)}
   .headshot{width:64px;height:64px}
   .svcrow{gap:8px}
   .endpoint a{font-size:10px}
   .drawer .db{padding:13px}
-  #exb-holder{height:calc(100vh - 120px);min-height:480px}
+  #exb-holder{height:56vh;min-height:340px}
 }
 </style>
 </head>
@@ -1495,14 +1502,13 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
 
 <!-- ============================ THE EXPERIENCE ============================ -->
 <section class="mode wide" id="m-experience">
-  <div class="card" style="margin-bottom:14px">
-    <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
+  <div class="card" style="margin-bottom:10px;padding:12px 16px">
+    <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
       <div style="flex:1 1 420px;min-width:280px">
-        <div class="eyebrow">The other half &middot; configurable</div>
-        <div class="hero" style="font-size:30px">The CFB Atlas Experience</div>
+        <div class="eyebrow" style="margin-bottom:4px">The other half &middot; configurable</div>
+        <div class="hero" style="font-size:22px">The CFB Atlas Experience</div>
         <div class="sub">Layer-first exploration, built in ArcGIS Experience Builder from the same services this page reads.
-        Nine web maps, four dashboards, Arcade popups carrying the narrative. It is running below with its own full navigation -
-        or open it in its own tab if you want the whole screen.</div>
+        It runs below with its own full navigation.</div>
       </div>
       <div style="flex:0 0 auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <a class="btn solid" style="text-decoration:none" href="https://experience.arcgis.com/experience/99f6d8062d3943c08aa7728d209060ff/" target="_blank" rel="noopener">Open full screen in a new tab &rarr;</a>
@@ -1510,7 +1516,7 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
     </div>
   </div>
   <div class="card" style="padding:0;overflow:hidden">
-    <div id="exb-holder" style="height:calc(100vh - 150px);min-height:680px;position:relative"></div>
+    <div id="exb-holder" style="height:60vh;min-height:420px;position:relative"></div>
   </div>
 </section>
 
@@ -1777,6 +1783,29 @@ const TRANSIENT_MAP_OPTS = { zoomControl:false, attributionControl:false,
 /* A Leaflet map built inside a display:none section measures 0x0, so fitBounds
    lands on a nonsense zoom. Remember the intended bounds and re-apply them the
    first time the section is actually visible. */
+/* The Lower 48. Every map gets a home button that returns here, so you can never
+   get lost - pan off to the Pacific and one click puts the country back. */
+const US48 = L.latLngBounds([24.4, -125.0], [49.5, -66.9]);
+function addHomeControl(map){
+  const Home = L.Control.extend({
+    options: { position: 'topleft' },
+    onAdd: function(){
+      const wrap = L.DomUtil.create('div', 'leaflet-bar leaflet-control atlas-home');
+      const a = L.DomUtil.create('a', '', wrap);
+      a.href = '#';
+      a.title = 'Zoom to the Lower 48';
+      a.setAttribute('role', 'button');
+      a.setAttribute('aria-label', 'Zoom to the Lower 48');
+      a.innerHTML = '\u2302';
+      L.DomEvent.on(a, 'click', L.DomEvent.stop);
+      L.DomEvent.on(a, 'click', function(){ map.fitBounds(US48, { animate:false }); });
+      L.DomEvent.disableClickPropagation(wrap);
+      return wrap;
+    }
+  });
+  map.addControl(new Home());
+  return map;
+}
 function rememberBounds(map, bounds){ map.__fit = bounds; }
 function refit(map){
   if (!map) return;
@@ -1844,9 +1873,26 @@ function mixWhite(hex, t){
   }).join('').toUpperCase();
 }
 /* GLOBAL RULE: every team mark renders inside a white chip. */
-const logoChip = (url, size) =>
+/* Small bounded lists load their marks immediately. Only the big collections
+   (666-row screener, the gauntlet board, 200+ slate cards) defer, because eager
+   there would mean hundreds of requests on first paint. Native lazy-loading does
+   not run in a background tab, so anything above the fold must not depend on it. */
+const logoChip = (url, size, lazy) =>
   '<span class="lchip ' + (size||'sm') + (has(url)?'':' empty') + '">' +
-  (has(url) ? '<img src="'+https(url)+'" alt="" loading="lazy">' : '') + '</span>';
+  (has(url) ? '<img src="'+https(url)+'" alt="" decoding="async"' + (lazy?' loading="lazy"':'') + '>' : '') + '</span>';
+
+/* Safety net: when a page becomes visible, any deferred mark already in the
+   viewport is promoted to eager. Covers the case where the intersection
+   observer never fired because the section was display:none when it rendered. */
+function wakeLazyImages(root){
+  const scope = root || document;
+  const h = window.innerHeight + 400;
+  scope.querySelectorAll('img[loading="lazy"]').forEach(im=>{
+    if (im.naturalWidth > 0) return;
+    const r = im.getBoundingClientRect();
+    if (r.bottom > -400 && r.top < h) im.loading = 'eager';
+  });
+}
 /* Map symbology is a team-colored point, not a logo chip. ESPN marks are
    inconsistent in size, padding and transparency, so at marker scale they read
    as noise; the color point is legible at every zoom. Logos stay in the HTML. */
@@ -2020,7 +2066,7 @@ let mapT, youMarker, countyLayer, nearLayer;
 const TURF = { pt:null, label:'' };
 
 function initTurfMap(){
-  mapT = L.map('map-turf', { zoomControl:true, attributionControl:true }).setView([39.4,-96.5], 4);
+  mapT = addHomeControl(L.map('map-turf', { zoomControl:true, attributionControl:true }).setView([39.4,-96.5], 4));
   L.tileLayer(TILE_BASE, { attribution:ESRI_ATTR, maxZoom:16 }).addTo(mapT);
   L.tileLayer(TILE_REF,  { maxZoom:16 }).addTo(mapT);
   countyLayer = L.layerGroup().addTo(mapT);
@@ -2393,7 +2439,7 @@ function drawSparks(a,b,ca,cb){
 async function drawTapeMap(a,b,ca,cb){
   const node = $('#map-tape'); if(!node) return;
   const gen = TAPE.gen;                          // this draw is only valid for this generation
-  const map = L.map(node, TRANSIENT_MAP_OPTS).setView([39.4,-96.5],3);
+  const map = addHomeControl(L.map(node, Object.assign({}, TRANSIENT_MAP_OPTS, { zoomControl:true })).setView([39.4,-96.5],3));
   TAPE.map = map;
   L.tileLayer(TILE_BASE,{maxZoom:12}).addTo(map);
   const grp = L.featureGroup().addTo(map);
@@ -2555,7 +2601,7 @@ function drawScreener(){
     const v = cellVal(t,c.k);
     if (c.k==='school'){
       return '<td><div class="schoolcell"><div class="swatch" style="background:'+vizColor(teamColor(t))+'"></div>' +
-        logoChip(t.logo_url, 'xs') +
+        logoChip(t.logo_url, 'xs', true) +
         '<span style="font-weight:700">'+esc(t.school)+'</span></div></td>';
     }
     if (c.k==='division') return '<td><span class="pill tier-'+esc(t.division)+'">'+esc(t.division)+'</span></td>';
@@ -2706,7 +2752,7 @@ function whyLine(g, w){
 const SL = { sort:'watch', day:'', match:'', tv:false, line:false, neutral:false, rival:false, hi:null };
 let slMap, slLayer;
 function initSlateMap(){
-  slMap = L.map('map-slate',{zoomControl:true}).setView([39.4,-96.5],4);
+  slMap = addHomeControl(L.map('map-slate',{zoomControl:true}).setView([39.4,-96.5],4));
   L.tileLayer(TILE_BASE,{attribution:ESRI_ATTR,maxZoom:14}).addTo(slMap);
   L.tileLayer(TILE_REF,{maxZoom:14}).addTo(slMap);
   slLayer = L.layerGroup().addTo(slMap);
@@ -2772,11 +2818,11 @@ function gameCard(g){
   const w = g._w;
   return '<article class="game" data-gid="'+g.game_id+'" style="--ca:'+ca+';--ch:'+ch+'">' +
     '<div class="gtop">' +
-      '<div class="gteam">'+logoChip(g.away_logo_url,'md') +
+      '<div class="gteam">'+logoChip(g.away_logo_url,'md',true) +
         '<div style="min-width:0"><div class="s">'+(rA?'<span class="rankpill">'+rA+'</span>':'')+esc(g.away_school)+'</div>' +
         '<div class="m">'+esc(g.away_conf||'')+(has(g.away_record25)?' &middot; '+esc(g.away_record25):'')+'</div></div></div>' +
       '<div class="vs">'+(g.neutral_site===1?'VS<br><span style="font-size:9px">neutral</span>':'AT')+'</div>' +
-      '<div class="gteam h">'+logoChip(g.home_logo_url,'md') +
+      '<div class="gteam h">'+logoChip(g.home_logo_url,'md',true) +
         '<div style="min-width:0"><div class="s">'+(rH?'<span class="rankpill">'+rH+'</span>':'')+esc(g.home_school)+'</div>' +
         '<div class="m">'+esc(g.home_conf||'')+(has(g.home_record25)?' &middot; '+esc(g.home_record25):'')+'</div></div></div>' +
     '</div>' +
@@ -2890,7 +2936,7 @@ function drawGauntletBoard(){
     const t = DB.byId.get(x.team_id);
     return '<tr data-tid="'+x.team_id+'">' + G_COLS.map(c=>{
       if (c.k==='school') return '<td><div class="schoolcell"><div class="swatch" style="background:'+vizColor(t?teamColor(t):'#5A7285')+'"></div>' +
-        logoChip(t&&t.logo_url, 'xs') +
+        logoChip(t&&t.logo_url, 'xs', true) +
         '<span style="font-weight:700">'+esc(x.school)+'</span></div></td>';
       if (c.k==='division') return '<td><span class="pill tier-'+esc(x.division)+'">'+esc(x.division)+'</span></td>';
       const v = x[c.k];
@@ -2977,7 +3023,7 @@ function drawGauntletTeam(){
 function drawGauntletMap(t, rec, vc){
   const node = $('#map-gaunt'); if(!node || !isFinite(t.latitude)) return;
   const gen = GAUNT.gen;
-  const map = L.map(node, Object.assign({}, TRANSIENT_MAP_OPTS, { zoomControl:true })).setView([t.latitude,t.longitude],5);
+  const map = addHomeControl(L.map(node, Object.assign({}, TRANSIENT_MAP_OPTS, { zoomControl:true })).setView([t.latitude,t.longitude],5));
   GAUNT.map = map;
   L.tileLayer(TILE_BASE,{maxZoom:14}).addTo(map);
   const grp = L.featureGroup().addTo(map);
@@ -3084,7 +3130,7 @@ function drawPollMap(rk, maxPts){
   const node = $('#map-poll'); if (!node) return;
   if (pollMap){ try{ pollMap.remove(); }catch(e){} pollMap = null; }
   pollMarks.clear();
-  pollMap = L.map(node, Object.assign({}, TRANSIENT_MAP_OPTS, { zoomControl:true })).setView([39.4,-96.5], 4);
+  pollMap = addHomeControl(L.map(node, Object.assign({}, TRANSIENT_MAP_OPTS, { zoomControl:true })).setView([39.4,-96.5], 4));
   L.tileLayer(TILE_BASE,{ maxZoom:14 }).addTo(pollMap);
   L.tileLayer(TILE_REF,{ maxZoom:14 }).addTo(pollMap);
   const grp = L.featureGroup().addTo(pollMap);
@@ -3186,7 +3232,9 @@ function setMode(m){
   if (m==='tape') inv(TAPE.map);
   if (m==='gauntlet') inv(GAUNT.map);
   if (m==='home') inv(pollMap);
-  if (m==='experience' && window.__loadExb) window.__loadExb();
+  document.body.classList.toggle('exb-fit', m==='experience');
+  if (m==='experience' && window.__loadExb){ window.__loadExb(); sizeExb(); }
+  setTimeout(()=> wakeLazyImages($('#m-'+m)), 80);
   location.hash = m;
 }
 function typeahead(inputSel, listSel, onPick){
@@ -3208,9 +3256,25 @@ function typeahead(inputSel, listSel, onPick){
   });
 }
 
+/* Give the embed every pixel left below the intro card, and not one more, so the
+   outer page has nothing to scroll. Recomputed on resize and orientation change. */
+function sizeExb(){
+  const h = $('#exb-holder'); if (!h) return;
+  requestAnimationFrame(()=>{
+    const top = h.getBoundingClientRect().top + window.scrollY;
+    const avail = Math.max(360, window.innerHeight - top - 14);
+    h.style.height = avail + 'px';
+    h.style.minHeight = '0';
+  });
+}
+
 const LIVE_MAPS = ()=> [mapT, slMap, TAPE.map, GAUNT.map, pollMap].filter(Boolean);
 let rsz;
-window.addEventListener('resize', ()=>{ clearTimeout(rsz); rsz = setTimeout(()=> LIVE_MAPS().forEach(refit), 180); });
+window.addEventListener('resize', ()=>{ clearTimeout(rsz); rsz = setTimeout(()=>{ LIVE_MAPS().forEach(refit);
+  if (document.body.classList.contains('exb-fit')) sizeExb(); }, 180); });
+let scr;
+window.addEventListener('scroll', ()=>{ clearTimeout(scr); scr = setTimeout(()=> wakeLazyImages(), 140); }, { passive:true });
+document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState === 'visible') wakeLazyImages(); });
 
 async function boot(){
   initTurfMap();
