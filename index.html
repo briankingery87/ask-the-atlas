@@ -916,6 +916,21 @@ table.mini td{padding:5px 6px;border-bottom:1px solid var(--line)}
 .why{padding:0 12px 12px;font-size:11px;color:var(--ink-3)}
 .why b{color:var(--cyan);font-weight:700}
 
+/* Slate: the methodology and the map share one row, 70/30. The explainer keeps
+   every word - it just packs into narrower columns. */
+.slate-brief{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,3fr);gap:16px;align-items:stretch;
+  border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
+.slate-brief .explainer{border-top:0;margin-top:0;padding-top:0}
+.slate-brief .ex-cols{grid-template-columns:repeat(auto-fit,minmax(186px,1fr));gap:9px 16px}
+.slate-brief .ex-cols > div{font-size:11.5px;line-height:1.45}
+.slate-brief .keygrid{grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:1px 14px}
+.slate-brief .keyitem{font-size:11.5px;padding:2px 0}
+.slate-brief .ex-title{margin-bottom:6px}
+.slate-map{display:flex;flex-direction:column;min-width:0}
+/* the map fills the row but never DRIVES its height - the explainer does - so
+   zooming cannot reflow the row (see the poll-map lesson) */
+.slate-map .mapbox{height:auto;flex:1 1 auto;min-height:270px}
+
 /* sparkline + legend */
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--ink-2);margin-top:6px}
 .legend span{display:flex;align-items:center;gap:6px}
@@ -1115,6 +1130,8 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
   .verdict{order:3;padding:8px 0}
   .verdictline{font-size:19px}
   .slate-grid{grid-template-columns:minmax(0,1fr)}
+  .slate-brief{grid-template-columns:minmax(0,1fr)}
+  .slate-map .mapbox{height:300px;flex:0 0 auto}
   .drawer{width:100%}
   footer.foot > div{grid-template-columns:1fr !important;gap:14px}
   #exb-holder{height:58vh;min-height:380px}
@@ -1478,7 +1495,8 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
       </div>
       <span class="tiny dim" id="sl-count"></span>
     </div>
-    <div class="explainer">
+    <div class="slate-brief">
+     <div class="explainer">
       <div class="ex-title">How the Watchability Score works</div>
       <div class="ex-cols">
         <div><b>Seven components, each 0-1, each weighted.</b> The score is the weighted mean of the components that have
@@ -1490,14 +1508,17 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
       </div>
       <div class="ex-title" style="margin-top:14px">The seven components and their weights</div>
       <div class="keygrid" id="watch-key"></div>
-      <div class="tiny dim" style="margin-top:8px">Reference only - these are the fixed weights, not controls.
+      <div class="tiny dim" style="margin-top:7px">Reference only - these are the fixed weights, not controls.
       Use the sort and filter row above to change what you see.</div>
+     </div>
+     <div class="slate-map">
+       <div class="mapbox" id="map-slate"></div>
+       <div class="tiny dim" style="margin-top:6px">Host venues for the filtered slate. The extent follows your filters,
+       and clicking a dot jumps to that game's card.</div>
+     </div>
     </div>
   </div>
-  <div class="grid" style="grid-template-columns:1fr;gap:14px">
-    <div class="mapbox" id="map-slate" style="height:340px"></div>
-    <div class="slate-grid" id="slate-grid"></div>
-  </div>
+  <div class="slate-grid" id="slate-grid"></div>
 </section>
 
 <!-- ============================ THE EXPERIENCE ============================ -->
