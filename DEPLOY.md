@@ -92,13 +92,16 @@ So whichever half someone lands on first can reach the other, add a link in the 
 
 ## Publishing updates
 
-Whenever `index.html` changes:
+**Double-click `publish.bat`.** It lives in this folder, next to `index.html`. It shows you what changed, asks for a
+one-line description (Enter accepts a timestamp), then stages, commits and pushes. It refuses to do anything if nothing
+changed, and tells you plainly if something failed.
+
+Make it a one-click habit: right-click `publish.bat` -> **Show more options** -> **Send to** -> **Desktop (create shortcut)**.
+
+If you would rather type it, this is the same thing as one paste in PowerShell - the semicolons chain it:
 
 ```powershell
-cd "C:\Users\brian.kingery\Claude\CFB Atlas\Claude\experience\ask-the-atlas"
-git add .
-git commit -m "Add the Rewind page"
-git push
+git add -A; git commit -m "what changed"; git push
 ```
 
 Live in under a minute.

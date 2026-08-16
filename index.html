@@ -2057,10 +2057,14 @@ async function loadAll(){
      - page load     = when this browser pulled it (the page never caches, so these are independent) */
   const stamps = DB.teams.map(t=>t.stamp_updated).filter(v=>isFinite(v));
   const newest = stamps.length ? new Date(Math.max.apply(null, stamps)) : null;
-  const fmt = d => d.toLocaleString(undefined,{dateStyle:'medium', timeStyle:'short'});
+  /* Both stamps render in Eastern and SAY so. A time with no stated zone is
+     unreadable to anyone who is not in the zone it was written in - the same
+     reason kickoff times are formatted from the epoch rather than trusted. */
+  const fmtET = d => d.toLocaleString('en-US', { timeZone: ET, month:'short', day:'numeric', year:'numeric',
+                                                 hour:'numeric', minute:'2-digit', timeZoneName:'short' });
   $('#foot-stamp').innerHTML =
-    (newest ? '<b>Data last refreshed</b> ' + fmt(newest) + ' &mdash; set by the weekly pipeline, not by this page.<br>' : '') +
-    '<b>This page loaded</b> ' + fmt(new Date()) + ' in your local time. Reload for the latest; nothing here is cached.';
+    (newest ? '<b>Data last refreshed</b> ' + fmtET(newest) + ' &mdash; set by the weekly pipeline, not by this page.<br>' : '') +
+    '<b>This page loaded</b> ' + fmtET(new Date()) + '. Reload for the latest; nothing here is cached.';
 }
 
 /* the current week is the calendar row whose window contains today, else the next one up */

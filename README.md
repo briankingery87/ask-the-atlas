@@ -89,6 +89,13 @@ Anything doing math on this data has to know the whole vocabulary:
 `has()` in `index.html` encodes exactly that. Fields that are still placeholder are reported as unavailable
 and dropped from index denominators - never scored as zero.
 
+## Publishing a change
+
+Double-click `publish.bat` - it stages, commits and pushes, prompting for a message. Equivalent to
+`git add -A; git commit -m "..."; git push`.
+
+A **data** refresh never needs a publish; the page reads the services live.
+
 ## Running it locally
 
 Double-click `index.html`. If your browser blocks the cross-origin requests from a `file://` page:
