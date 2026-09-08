@@ -3,3 +3,5 @@ Thumbs.db
 *.bak
 *.tmp
 node_modules/
+.appcheck.js
+shot-*.png
