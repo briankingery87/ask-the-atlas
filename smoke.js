@@ -118,36 +118,50 @@ const CALENDAR = [
 const SCHEDULE = [
   /* week 1 is IN THE BOOKS - every row completed with a score. currentWeek() must
      skip it even though the calendar window for week 1 ends today. */
-  {game_id:11, week:1, season_type:'regular', start_date:Date.now()-8*86400000, start_time_tbd:0, completed:1, neutral_site:0, conference_game:0,
+  {game_id:11, season:2026, week:1, season_type:'regular', start_date:Date.now()-8*86400000, start_time_tbd:0, completed:1, neutral_site:0, conference_game:0,
    venue:'Ohio Stadium', home_id:194, home_team:'Ohio State', home_conference:'Big Ten', home_division:'FBS', home_points:38,
    away_id:2229, away_team:'Ferris State', away_conference:'GLIAC', away_division:'D2', away_points:10, tv_outlet:'BTN'},
-  {game_id:12, week:1, season_type:'regular', start_date:Date.now()-7*86400000, start_time_tbd:0, completed:1, neutral_site:0, conference_game:0,
+  {game_id:12, season:2026, week:1, season_type:'regular', start_date:Date.now()-7*86400000, start_time_tbd:0, completed:1, neutral_site:0, conference_game:0,
    venue:'Michigan Stadium', home_id:130, home_team:'Michigan', home_conference:'Big Ten', home_division:'FBS', home_points:17,
    away_id:2483, away_team:'Wyoming', away_conference:'Mountain West', away_division:'FBS', away_points:20, tv_outlet:'FOX'},
   /* week 2 - the one the app should open on */
-  {game_id:21, week:2, season_type:'regular', start_date:Date.now()+2*86400000, start_time_tbd:0, completed:0, neutral_site:0, conference_game:1,
+  {game_id:21, season:2026, week:2, season_type:'regular', start_date:Date.now()+2*86400000, start_time_tbd:0, completed:0, neutral_site:0, conference_game:1,
    venue:'Ohio Stadium', home_id:194, home_team:'Ohio State', home_conference:'Big Ten', home_division:'FBS', home_points:-1,
    away_id:130, away_team:'Michigan', away_conference:'Big Ten', away_division:'FBS', away_points:-1, tv_outlet:'FOX'},
-  {game_id:22, week:2, season_type:'regular', start_date:Date.now()+3*86400000, start_time_tbd:1, completed:0, neutral_site:0, conference_game:1,
+  {game_id:22, season:2026, week:2, season_type:'regular', start_date:Date.now()+3*86400000, start_time_tbd:1, completed:0, neutral_site:0, conference_game:1,
    venue:'War Memorial', home_id:2483, home_team:'Wyoming', home_conference:'Mountain West', home_division:'FBS', home_points:-1,
    away_id:2229, away_team:'Ferris State', away_conference:'GLIAC', away_division:'D2', away_points:-1, tv_outlet:'N/A'},
-  {game_id:23, week:2, season_type:'regular', start_date:Date.now()+3*86400000, start_time_tbd:0, completed:0, neutral_site:1, conference_game:0,
+  {game_id:23, season:2026, week:2, season_type:'regular', start_date:Date.now()+3*86400000, start_time_tbd:0, completed:0, neutral_site:1, conference_game:0,
    venue:'Neutral Dome', home_id:130, home_team:'Michigan', home_conference:'Big Ten', home_division:'FBS', home_points:-1,
    away_id:2483, away_team:'Wyoming', away_conference:'Mountain West', away_division:'FBS', away_points:-1, tv_outlet:'ESPN'},
   /* week 3 - must exist in the picker but never be the default */
-  {game_id:31, week:3, season_type:'regular', start_date:Date.now()+9*86400000, start_time_tbd:0, completed:0, neutral_site:0, conference_game:0,
+  {game_id:31, season:2026, week:3, season_type:'regular', start_date:Date.now()+9*86400000, start_time_tbd:0, completed:0, neutral_site:0, conference_game:0,
    venue:'Ohio Stadium', home_id:194, home_team:'Ohio State', home_conference:'Big Ten', home_division:'FBS', home_points:-1,
    away_id:9999, away_team:'Wisconsin-River Falls', away_conference:'WIAC', away_division:'D3', away_points:-1, tv_outlet:'BTN'}
 ];
 /* Betting Lines carries one row PER SPORTSBOOK. Game 21 has three, so the
    dedupe has to pick DraftKings and the slate has to show exactly one line. */
 const LINES = [
-  {game_id:21, week:2, provider:'consensus',  spread:-3.5, over_under:54.5, formatted:'Ohio State -3.5'},
-  {game_id:21, week:2, provider:'DraftKings', spread:-4.0, over_under:55.5, formatted:'Ohio State -4.0'},
-  {game_id:21, week:2, provider:'Bovada',     spread:-3.0, over_under:54.0, formatted:'Ohio State -3.0'},
-  {game_id:23, week:2, provider:'ESPN Bet',   spread:-14,  over_under:61.5, formatted:'Michigan -14.0'},
-  {game_id:11, week:1, provider:'DraftKings', spread:-28,  over_under:49.5, formatted:'Ohio State -28.0'}
+  {game_id:21, season:2026, week:2, provider:'consensus',  spread:-3.5, over_under:54.5, formatted:'Ohio State -3.5'},
+  {game_id:21, season:2026, week:2, provider:'DraftKings', spread:-4.0, over_under:55.5, formatted:'Ohio State -4.0'},
+  {game_id:21, season:2026, week:2, provider:'Bovada',     spread:-3.0, over_under:54.0, formatted:'Ohio State -3.0'},
+  {game_id:23, season:2026, week:2, provider:'ESPN Bet',   spread:-14,  over_under:61.5, formatted:'Michigan -14.0'},
+  {game_id:11, season:2026, week:1, provider:'DraftKings', spread:-28,  over_under:49.5, formatted:'Ohio State -28.0'}
 ];
+/* The recap archive. Deliberately covers only ONE of the two completed week-1
+   games: game 12 is played but absent, which is the real D2 / not-yet-rebuilt case
+   and must render no postgame block at all rather than a shell full of dashes. */
+const RESULTS = [
+  {game_id:11, week:1, week_key:'2026-0-01', week_label:'Week 1', home_points:38, away_points:10,
+   winner_id:194, winner_team:'Ohio State', margin:28, aftermath_index:44, index_why:'swing 91, stakes 60, scoring 40',
+   excitement_index:3.1, upset:0, rivalry:0, went_ot:0, one_score:0, comeback:0,
+   cover_result:'Home covered', ou_result:'Under', ml_payout:8.2, attendance:102780}
+];
+const RECAPS = [
+  {game_id:11, headline:'BUCKEYES BURY FERRIS STATE BY FOUR SCORES', money_line:'Never in doubt after the second quarter.',
+   angle:'blowout', tux_grade:'D', gen_status:'voiced'}
+];
+
 const feat = (attrs, geometry) => geometry ? { attributes:attrs, geometry } : { attributes:attrs };
 
 (async () => {
@@ -189,6 +203,10 @@ const feat = (attrs, geometry) => geometry ? { attributes:attrs, geometry } : { 
       body = { features: RANKINGS.map(x=>feat(x)) };
     } else if (/CFB_Atlas_Stats\/FeatureServer\/2/.test(all)) {
       body = { features: RATINGS.map(x=>feat(x)) };
+    } else if (/CFB_Atlas_Recaps\/FeatureServer\/0/.test(all)) {
+      body = { features: /resultOffset=[1-9]/.test(all) ? [] : RESULTS.map(x=>feat(x)) };
+    } else if (/CFB_Atlas_Recaps\/FeatureServer\/1/.test(all)) {
+      body = { features: /resultOffset=[1-9]/.test(all) ? [] : RECAPS.map(x=>feat(x)) };
     } else if (/CFB_Atlas_Stats\/FeatureServer\/3/.test(all)) {
       body = { features: LINES.map(x=>feat(x)) };
     } else if (/CFB_Atlas_Stats\/FeatureServer\/4/.test(all)) {
@@ -404,6 +422,33 @@ const feat = (attrs, geometry) => geometry ? { attributes:attrs, geometry } : { 
   out.wk1_scores = await page.locator('#slate-grid .gsc').allTextContents();
   out.wk1_winner = await page.locator('#slate-grid .gsc.w').allTextContents();
   out.wk1_days   = await page.locator('#sl-day option').allTextContents();
+  // ---- the postgame block, joined from the Recaps service ----
+  out.tux_blocks   = await page.locator('#slate-grid .tux').count();          // 1 of 2 - game 12 is not archived
+  out.tux_grade    = await page.textContent('#slate-grid .tgrade').catch(()=>'none');
+  out.tux_outcome  = await page.textContent('#slate-grid .tres').catch(()=>'none');
+  out.tux_headline = await page.textContent('#slate-grid .thead').catch(()=>'none');
+  out.tux_delivered= await page.textContent('#slate-grid .tidx').catch(()=>'none');
+  out.tux_link     = await page.getAttribute('#slate-grid a.tbtn','href').catch(()=>'none');
+  out.tux_flag     = await page.locator('#slate-grid .tflag').allTextContents();
+  out.tux_gradecls = await page.getAttribute('#slate-grid .tgrade','class').catch(()=>'none');
+  // live records replace last season's on the card
+  out.card_records = await page.locator('#slate-grid .gteam .m').allTextContents();
+  // the map popup
+  await page.locator('#map-slate path.leaflet-interactive').first().click();
+  await page.waitForTimeout(300);
+  out.popup = (await page.textContent('.leaflet-popup-content').catch(()=>'none')).replace(/\s+/g,' ').trim();
+  out.popup_rows = await page.locator('.leaflet-popup-content .pop .prow').count();
+  out.popup_link = await page.getAttribute('.leaflet-popup-content a.tbtn','href').catch(()=>'none');
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(150);
+  // the OTHER marker is the archived game - its popup must carry the grade and the link
+  await page.locator('#map-slate path.leaflet-interactive').nth(1).click();
+  await page.waitForTimeout(300);
+  out.popup2 = (await page.textContent('.leaflet-popup-content').catch(()=>'none')).replace(/\s+/g,' ').trim();
+  out.popup2_link = await page.getAttribute('.leaflet-popup-content a.tbtn','href').catch(()=>'none');
+  out.popup2_grade = await page.locator('.leaflet-popup-content .tgrade').count();
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(150);
   await page.locator('#slate-grid').screenshot({ path:'/home/claude/ata/shot-slate-wk1.png' });
   // day cascade inside a week
   await page.selectOption('#sl-week','2');
@@ -452,6 +497,7 @@ const feat = (attrs, geometry) => geometry ? { attributes:attrs, geometry } : { 
   out.nav_q       = await page.locator('nav.modes button em').count();
   out.foot_stamp  = (await page.textContent('#foot-stamp')).replace(/\s+/g,' ').trim();
 
+  out.tux_sibling_card = await page.locator('.split.three > .card').count();
   out.gamesThisWeek_reads = gtwHits;   // must be 0
   out.pageerrors = errors;
   out.console_errors = console_errors.filter(t => !/net::ERR|Failed to load resource/.test(t));

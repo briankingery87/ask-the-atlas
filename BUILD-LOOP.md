@@ -33,6 +33,18 @@ source back out of the built file. Keeping `src/`, `vendor/`, `build.py` and
 `smoke.js` in the repo means that cannot happen twice. They add ~360 KB and
 GitHub Pages ignores them.
 
+## Sibling apps
+
+| Surface | Repo | What it answers |
+|---|---|---|
+| The Experience | ArcGIS Experience Builder (no repo) | explore the layers |
+| Ask the Atlas | this one | what is worth watching, before kickoff |
+| Tux's Take | `briankingery87/tuxs-take` | what happened, after |
+
+A completed game on The Slate links to `tuxs-take/?game=<CFBD game_id>#aftermath`,
+which Tux's Take resolves to its own game drawer. That deep link is a contract
+between the two repos: if it changes on one side, change it on the other.
+
 ## What the page reads
 
 Public ArcGIS REST services, anonymously, at page load. There is no key, no
@@ -40,4 +52,8 @@ token and no server, and there never can be - the file is public by
 construction. The Slate is built from **CFB_Atlas_Stats/FeatureServer/0
 (Schedule)** joined to Teams and Betting Lines, not from Games This Week, so
 every week of the season is addressable rather than just the one week that
-service happens to hold.
+service happens to hold. Completed games additionally join
+**CFB_Atlas_Recaps/FeatureServer/0 and /1** for the result, the Tux grade and the
+recap headline. That service is loaded in its own try/catch: if it ever stops
+answering, the postgame block simply does not render and the rest of the page is
+unaffected.

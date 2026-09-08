@@ -240,6 +240,38 @@ table.mini td{padding:5px 6px;border-bottom:1px solid var(--line)}
 .gsc{display:inline-block;margin-left:6px;font-variant-numeric:tabular-nums;font-weight:900;color:var(--ink-3)}
 .gsc.w{color:var(--ink-1)}
 .gfinal{background:rgba(224,89,42,.16);color:#F08A5D;border-radius:4px;padding:0 5px;font-weight:900;letter-spacing:.08em}
+/* ---- the postgame block, read from Tux's Take ---- */
+.tux{border-top:1px solid var(--line);margin-top:10px;padding-top:10px;display:grid;gap:7px}
+.tuxrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0}
+.tgrade{display:inline-flex;align-items:center;gap:5px;font-weight:900;font-size:12px;
+  border:1px solid var(--line-strong);border-radius:6px;padding:2px 8px;white-space:nowrap}
+.tgrade b{font-size:14px}
+.tgrade.g-a{border-color:rgba(47,161,115,.7);color:#57C79A;background:rgba(47,161,115,.13)}
+.tgrade.g-b{border-color:rgba(44,158,199,.7);color:#5FC2E4;background:rgba(44,158,199,.13)}
+.tgrade.g-c{color:var(--ink-2)}
+.tgrade.g-d{border-color:rgba(224,89,42,.6);color:#F08A5D;background:rgba(224,89,42,.11)}
+.tres{font-weight:700;font-size:12px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tidx{font-size:11px;color:var(--ink-3);white-space:nowrap;margin-left:auto}
+.tidx b{color:var(--ink-1);font-size:13px;font-variant-numeric:tabular-nums}
+.tflag{font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;border-radius:999px;
+  padding:1px 7px;border:1px solid var(--line-strong);color:var(--ink-3);white-space:nowrap}
+.tflag.over{border-color:rgba(47,161,115,.6);color:#57C79A}
+.tflag.under{border-color:rgba(224,89,42,.55);color:#F08A5D}
+.thead{font-size:12.5px;font-weight:800;line-height:1.35;color:var(--ink-1)}
+.tquote{font-size:11.5px;color:var(--ink-2);font-style:italic;line-height:1.4}
+a.tbtn{display:inline-block;text-decoration:none;font-size:11.5px;font-weight:800;
+  border:1px solid var(--accent-deep);color:var(--accent);border-radius:7px;padding:4px 10px;
+  justify-self:start}
+a.tbtn:hover{background:rgba(77,195,232,.12)}
+/* ---- richer map popups ---- */
+.leaflet-popup-content{margin:10px 12px;min-width:210px}
+.pop .prow{display:flex;align-items:center;gap:7px;padding:3px 0}
+.pop .prow .nm{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.pop .prow .rc{font-size:11px;color:var(--ink-3);white-space:nowrap}
+.pop .prow .pt{font-weight:900;font-variant-numeric:tabular-nums;min-width:22px;text-align:right}
+.pop .prow.lost .nm,.pop .prow.lost .pt{color:var(--ink-3)}
+.pop .pmeta{font-size:11px;color:var(--ink-3);margin-top:6px;line-height:1.45}
+.pop .pfoot{margin-top:7px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
 .gmeta{padding:0 12px 10px;font-size:11px;color:var(--ink-2);display:flex;gap:10px;flex-wrap:wrap}
 .gmeta b{color:var(--ink)}
 .watch{display:flex;align-items:center;gap:9px;padding:9px 12px;border-top:1px solid var(--line);background:rgba(255,255,255,.02)}
@@ -291,6 +323,9 @@ footer.foot b{color:var(--ink-2)}
 .homehero{display:grid;grid-template-columns:1.5fr 1fr;gap:26px;align-items:center}
 .homehero p{max-width:60ch;color:var(--ink-2);margin:12px 0 0;font-size:15px}
 .split{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
+/* The Atlas is three surfaces now, not two: configurable, preview, postgame. */
+.split.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.badge.post{background:rgba(47,161,115,.22);color:#57C79A}
 .split > .card{margin-top:0;display:flex;flex-direction:column}
 .half-h{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .half-h .badge{font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:4px;font-weight:900}
@@ -434,8 +469,10 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
   .gauntlet-layout > .card{position:static !important}
   #poll-wrap{grid-template-columns:minmax(0,1fr) !important}
 }
+@media (max-width:1250px){ .split.three{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media (max-width:1180px){
   .homehero,.split,.svcrow{grid-template-columns:minmax(0,1fr)}
+  .split.three{grid-template-columns:minmax(0,1fr)}
   .hero.big{font-size:38px}
   .authorrow{grid-template-columns:80px minmax(0,1fr);gap:14px}
   .tglogo{grid-column:1/-1;justify-self:start;max-width:170px}
@@ -562,7 +599,7 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
     </div>
   </div>
 
-  <div class="split" style="margin-top:14px">
+  <div class="split three" style="margin-top:14px">
     <div class="card">
       <div class="half-h"><span class="badge cfg">Configurable</span><h3 style="margin:0">The CFB Atlas Experience</h3></div>
       <p class="muted" style="margin:0 0 12px;font-size:13px">Layer-first. Built in ArcGIS Experience Builder from the same
@@ -588,7 +625,21 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
         <li>Client-side math on top of the published data - joins, distances, indexes</li>
         <li>Grows through the season as the services fill in</li>
       </ul>
-      <div style="margin-top:auto;padding-top:12px" class="tiny dim">Two halves, one data model. Neither replaces the other.</div>
+      <div style="margin-top:auto;padding-top:12px" class="tiny dim">Three surfaces, one data model. None of them replaces the others.</div>
+    </div>
+    <div class="card">
+      <div class="half-h"><span class="badge post">Post-game</span><h3 style="margin:0">Tux&rsquo;s Take</h3></div>
+      <p class="muted" style="margin:0 0 12px;font-size:13px">Result-first. This page scores what is worth watching
+      <b>before</b> kickoff. Tux&rsquo;s Take reads the same Atlas and writes what actually happened <b>after</b> -
+      final scores, quarter by quarter, an Aftermath Index and a recap in a beagle&rsquo;s voice.</p>
+      <ul class="road" style="font-size:12px">
+        <li>Every completed game on The Slate links straight to its recap</li>
+        <li>The Tux grade and the Aftermath Index are quoted here, never recomputed</li>
+        <li>Same <code>game_id</code> join key as everything else in the Atlas</li>
+      </ul>
+      <div style="margin-top:auto;padding-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <a class="btn solid" style="display:inline-block;text-decoration:none" href="https://briankingery87.github.io/tuxs-take/" target="_blank" rel="noopener">Open Tux&rsquo;s Take &rarr;</a>
+      </div>
     </div>
   </div>
 
@@ -839,6 +890,9 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
         divisor rather than scoring zero on them, so a Tuesday game the sportsbooks ignored is not punished for their silence.</div>
         <div><b>Every card shows its working.</b> The line under each score names the two or three components that actually
         carried it, so a 71 is never just a number.</div>
+        <div><b>A finished game closes its own loop.</b> Pick an earlier week and each card picks up the result, the
+        Tux grade and the recap from <a href="https://briankingery87.github.io/tuxs-take/" target="_blank" rel="noopener">Tux&rsquo;s Take</a>.
+        Watchability was the promise; the Aftermath Index is the delivery.</div>
       </div>
       <div class="ex-title" style="margin-top:14px">The seven components and their weights</div>
       <div class="keygrid" id="watch-key"></div>
@@ -886,7 +940,7 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
         <div class="an"><b>Brian Kingery</b><span>, GISP, PMP</span></div>
         <div class="at">GIS Solutions Architect &nbsp;|&nbsp; Timmons Group</div>
         <p>Built nights and weekends with Claude, in ArcGIS Pro and ArcGIS Online, for zero dollars.
-        Every layer, popup, model and page across both halves of the CFB Atlas came out of that loop.</p>
+        Every layer, popup, model and page across all three surfaces of the CFB Atlas came out of that loop.</p>
         <div class="al">
           <a href="https://www.linkedin.com/in/briankingery87/" target="_blank" rel="noopener">Connect on LinkedIn &rarr;</a>
           <span class="dim">|</span>
@@ -902,15 +956,19 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
   <div class="split">
     <div class="card">
       <h3>What Ask the Atlas is</h3>
-      <p class="muted" style="margin:0 0 10px">The CFB Atlas has two halves that share one data model.
-      <b style="color:var(--ink)">The Experience</b> is the configurable half - ArcGIS Experience Builder, nine web maps,
+      <p class="muted" style="margin:0 0 10px">The CFB Atlas is three surfaces over one data model.
+      <b style="color:var(--ink)">The Experience</b> is the configurable one - ArcGIS Experience Builder, nine web maps,
       four dashboards, Arcade popups. You pick a view, toggle layers, click a feature. It is the right tool for exploring
       a theme and it is where the cartography lives.</p>
-      <p class="muted" style="margin:0 0 10px"><b style="color:var(--ink)">Ask the Atlas</b> is the custom half. It reads
-      the same published services through their REST endpoints and does the thing configuration cannot: joins across
-      services, distance math, ad-hoc filtering, and composite indexes computed in the browser. Five questions, one page each.</p>
-      <p class="muted" style="margin:0 0 14px">Neither replaces the other. The Experience answers "show me the fan territory layer."
-      Ask the Atlas answers "whose country do I live in."</p>
+      <p class="muted" style="margin:0 0 10px"><b style="color:var(--ink)">Ask the Atlas</b> is the custom one, and it looks
+      forward. It reads the same published services through their REST endpoints and does the thing configuration cannot:
+      joins across services, distance math, ad-hoc filtering, and composite indexes computed in the browser. Five questions,
+      one page each.</p>
+      <p class="muted" style="margin:0 0 10px"><b style="color:var(--ink)"><a href="https://briankingery87.github.io/tuxs-take/" target="_blank" rel="noopener">Tux&rsquo;s Take</a></b>
+      looks back. It holds the recap archive - final scores, an Aftermath Index and the writing - and this page reads two of
+      its layers so a finished game on The Slate can show what it actually turned into and link to the full recap.</p>
+      <p class="muted" style="margin:0 0 14px">None of them replaces the others. The Experience answers "show me the fan
+      territory layer." Ask the Atlas answers "whose country do I live in." Tux&rsquo;s Take answers "what did I miss."</p>
       <div class="tiles" id="about-glance" style="margin-top:auto"></div>
     </div>
     <div class="card">
@@ -1042,7 +1100,8 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
     <div>
       <b>Ask the Atlas</b> is the custom half of the <b>CFB Atlas</b>, a college football data and mapping project
       covering all 666 NCAA programs across FBS, FCS, Division II and Division III. Built and maintained by Brian Kingery.
-      The configurable half lives in ArcGIS Experience Builder.
+      The configurable half lives in ArcGIS Experience Builder; the post-game half is
+      <a href="https://briankingery87.github.io/tuxs-take/" target="_blank" rel="noopener">Tux&rsquo;s Take</a>.
     </div>
     <div>
       <b>Data</b><br>
@@ -1085,8 +1144,18 @@ const SVC = {
   rankings:  ORG + 'CFB_Atlas_Stats/FeatureServer/1',
   ratings:   ORG + 'CFB_Atlas_Stats/FeatureServer/2',
   lines:     ORG + 'CFB_Atlas_Stats/FeatureServer/3',
-  calendar:  ORG + 'CFB_Atlas_Stats/FeatureServer/4'
+  calendar:  ORG + 'CFB_Atlas_Stats/FeatureServer/4',
+  /* The post-game half of the Atlas. Ask the Atlas is the PREVIEW app - it scores
+     what is worth watching before kickoff. Tux's Take writes what happened after.
+     Reading its two layers here is what lets a finished game on The Slate close its
+     own loop: the pregame score sits next to the postgame one, on the same card. */
+  results:   ORG + 'CFB_Atlas_Recaps/FeatureServer/0',
+  recaps:    ORG + 'CFB_Atlas_Recaps/FeatureServer/1'
 };
+/* The sibling apps. A game deep link is ?game=<CFBD game_id>, which Tux's Take
+   resolves to its own drawer - the join key is the same one used everywhere here. */
+const TUX = 'https://briankingery87.github.io/tuxs-take/';
+const tuxGameUrl = gid => TUX + '?game=' + gid + '#aftermath';
 const ITEM = id => 'https://www.arcgis.com/home/item.html?id=' + id;
 /* Documented for the Under the Hood table: every layer this page touches,
    what it represents, and where to go to read the item's own metadata. */
@@ -1104,7 +1173,7 @@ const SERVICE_DOCS = [
     n:'111 polygons',
     d:'Counties dissolved by dominant program into contiguous empires, with population, county count, national rank, states touched and battlegrounds held. The seams between counties disappear and the territory reads as one country.' },
   { svc:'CFB Atlas Games This Week', item:'d690878eb9d44537b11bf54d1ea12177', layer:'0 - Games This Week', url:SVC.games,
-    n:'~200 points per week',
+    read:false, n:'~200 points per week',
     d:'One week of games as host-venue points, rebuilt every Sunday, with both teams denormalized onto the row. NOT READ BY THIS PAGE. It only ever holds a single week, which makes a week picker impossible and leaves the app one bad Sunday away from showing the wrong slate, so the Slate is built from the Schedule table joined to Teams and Betting Lines instead. Documented here because it is part of the Atlas and the configurable side uses it.' },
   { svc:'CFB Atlas Stats', item:'0bc5eeaf2c204d038c4a25807dfa00bd', layer:'0 - Schedule (table)', url:SVC.schedule,
     n:'1,608 rows',
@@ -1121,6 +1190,19 @@ const SERVICE_DOCS = [
   { svc:'CFB Atlas Stats', item:'0bc5eeaf2c204d038c4a25807dfa00bd', layer:'4 - Calendar (table)', url:SVC.calendar,
     n:'16 rows',
     d:'The season\'s week boundaries - first and last game date per week, regular season and postseason. Note the windows OVERLAP at every boundary - week 1 ends the same day week 2 begins - so "the window containing today" is ambiguous once a week. The current week here is instead the earliest regular week that still has a game left to play, taken from the schedule; the calendar supplies the dates around it.' },
+  { svc:'CFB Atlas Recaps', item:'d086e18de78745479a0cbffccdf473c0', layer:'0 - Game Results (table)', url:SVC.results,
+    n:'331 rows and growing',
+    d:'One row per completed game that made the recap archive: final score, quarter line scores, margin, ' +
+      'the CFBD excitement index, the Aftermath Index with its components, the market result and the crowd. ' +
+      'The Slate reads it to turn a finished game from a prediction into a result. Coverage is FBS in full plus ' +
+      'the FCS games that were ranked, a rivalry, or decided by seven or fewer - Division II and III are absent ' +
+      'rather than empty, because no free source publishes their scores.' },
+  { svc:'CFB Atlas Recaps', item:'d086e18de78745479a0cbffccdf473c0', layer:'1 - Game Recaps (table)', url:SVC.recaps,
+    n:'331 rows and growing',
+    d:'The writing: a headline, a one-line take, an angle, and the Tux grade - the excitement percentile within ' +
+      'that game\'s own week, expressed as a letter. Most rows are written by a language model against a fixed ' +
+      'style card; the rest are built by rule from the box score. This page quotes the grade and the headline ' +
+      'and never recomputes either. The app that owns them is Tux\'s Take.' },
   { svc:'CFB Atlas Recruiting', item:'5de80950c4eb4482a9a7360ada942c41', layer:'0 - Recruits', url:SVC.recruits,
     n:'3,051 points',
     d:'The 2026 recruiting class mapped at each commit\'s hometown, with stars, position and destination program. Published and public; a recruiting page for Ask the Atlas is the next obvious question.' },
@@ -1297,6 +1379,22 @@ async function q(url, params){
   return j;
 }
 const rows = j => (j.features||[]).map(f => Object.assign({}, f.attributes, f.geometry?{_g:f.geometry}:{}));
+/* Paged read. resultRecordCount is silently CLAMPED to the layer's maxRecordCount,
+   so a single big query does not fail when a table outgrows the cap - it just
+   returns a truncated answer, which is worse. The Recaps archive grows every week,
+   so it is read with the offset loop rather than one hopeful request. */
+async function qAll(url, params){
+  const out = [];
+  const page = 2000;
+  for (let off = 0; off < 20000; off += page){
+    const j = await q(url, Object.assign({}, params, { resultOffset:off, resultRecordCount:page }));
+    const r = rows(j);
+    out.push.apply(out, r);
+    if (r.length < page || j.exceededTransferLimit === false) break;
+    if (!r.length) break;
+  }
+  return out;
+}
 
 /* Kickoff times. The service ships a preformatted kickoff_str with no timezone
    stated, which is unreadable if you are not in the tz it was built in. Format
@@ -1342,7 +1440,11 @@ const winPct = rec => { const m = has(rec) && String(rec).match(/^(\d+)-(\d+)/);
 /* ---------- 2. load -------------------------------------------------- */
 const DB = { teams:[], byId:new Map(), byName:new Map(), empires:new Map(), games:[],
   schedule:[], lines:[], slate:[], rankings:[], rankByTeam:new Map(), ratings:new Map(),
-  calendar:[], week:null, ready:false };
+  calendar:[], week:null, ready:false,
+  /* recap = one merged row per completed game, joined from the two Recaps layers.
+     rec26 = each team's record SO FAR THIS SEASON, derived here from completed
+     schedule rows because no published field carries it. */
+  recap:new Map(), recapOk:false, recapErr:null, rec26:new Map(), season:null };
 
 async function loadAll(){
   const stamp = $('#loadstate');
@@ -1382,11 +1484,42 @@ async function loadAll(){
      the price comes from Betting Lines. */
   const [sch, lin] = await Promise.all([
     q(SVC.schedule, { where:'1=1', resultRecordCount:5000,
-      outFields:'game_id,week,season_type,start_date,start_time_tbd,completed,neutral_site,conference_game,venue,home_id,home_team,home_conference,home_division,home_points,away_id,away_team,away_conference,away_division,away_points,tv_outlet' }),
+      outFields:'game_id,season,week,season_type,start_date,start_time_tbd,completed,neutral_site,conference_game,venue,home_id,home_team,home_conference,home_division,home_points,away_id,away_team,away_conference,away_division,away_points,tv_outlet' }),
     q(SVC.lines, { where:'1=1', resultRecordCount:5000,
       outFields:'game_id,week,provider,spread,over_under,formatted' })
   ]);
   DB.schedule = rows(sch); DB.lines = rows(lin);
+  buildRecords();
+
+  step('Loading the recap archive');
+  /* A DIFFERENT SERVICE, so it gets its own try/catch. Everything on this page
+     worked before Tux's Take existed and must keep working if Recaps is ever
+     unshared, renamed or empty - the postgame block simply does not render, and
+     Under the Hood says why instead of the page dying. */
+  try {
+    const [res, rec] = await Promise.all([
+      qAll(SVC.results, { where:'1=1', orderByFields:'game_id ASC',
+        outFields:'game_id,week,week_key,week_label,home_points,away_points,winner_id,winner_team,' +
+                  'margin,aftermath_index,index_why,excitement_index,upset,rivalry,went_ot,one_score,' +
+                  'comeback,cover_result,ou_result,ml_payout,attendance' }),
+      qAll(SVC.recaps,  { where:'1=1', orderByFields:'game_id ASC',
+        outFields:'game_id,headline,money_line,angle,tux_grade,gen_status' })
+    ]);
+    const byId = new Map();
+    res.forEach(r => byId.set(r.game_id, Object.assign({}, r)));
+    rec.forEach(r => {
+      const cur = byId.get(r.game_id) || { game_id:r.game_id };
+      /* "N/A" is a real value in tux_grade - three week-1 rows carry it - so it is
+         normalised to absent here rather than printed as a grade of N/A */
+      cur.headline = has(r.headline) ? r.headline : null;
+      cur.money_line = has(r.money_line) ? r.money_line : null;
+      cur.angle = has(r.angle) ? r.angle : null;
+      cur.tux_grade = has(r.tux_grade) ? r.tux_grade : null;
+      cur.voiced = r.gen_status === 'voiced';
+      byId.set(r.game_id, cur);
+    });
+    DB.recap = byId; DB.recapOk = true;
+  } catch(e){ DB.recapErr = e.message; }
 
   DB.week = currentWeek();
   buildSlateRows();
@@ -1661,7 +1794,7 @@ function renderNearbyGames(lat, lon){
         '<span class="dim tiny" style="flex:0 0 auto">'+(g.neutral_site===1?'vs':'at')+'</span>' +
         logoChip(g.home_logo_url, 'xs') +
         '<div style="min-width:0;margin-left:4px"><div style="font-weight:700">'+esc(g.matchup)+'</div>' +
-        '<div class="tiny dim">'+esc(k.full)+' &middot; '+esc(g.venue)+', '+esc(g.host_city)+' '+esc(g.host_state)+
+        '<div class="tiny dim">'+(g.completed===1 ? 'FINAL &middot; '+outcomeLine(g, g._r) : esc(k.full))+' &middot; '+esc(g.venue)+', '+esc(g.host_city)+' '+esc(g.host_state)+
         (has(g.tv_outlet)?' &middot; '+esc(g.tv_outlet):'')+(has(g.line_str)?' &middot; '+esc(g.line_str):'')+'</div></div>' +
         '<div class="d"><b class="num">'+x.mi.toFixed(0)+'</b><div class="tiny dim">mi</div></div></div>';
     }).join('');
@@ -2209,12 +2342,55 @@ function slateRow(g, lines){
     _approxLoc: neutral
   };
 }
+/* THE RECORD NOBODY PUBLISHES.
+   Teams carries record_2025, which is LAST season and goes stale the moment the new
+   one kicks off. There is no current-record field anywhere in the Atlas, so it is
+   derived here from the only source of truth there is: completed rows in Schedule.
+   Ties are counted separately rather than folded into losses. */
+function buildRecords(){
+  const seasons = DB.schedule.map(g=>g.season).filter(v=>isFinite(v));
+  DB.season = seasons.length ? Math.max.apply(null, seasons) : null;
+  const M = DB.rec26; M.clear();
+  const slot = id => { if (!M.has(id)) M.set(id, { w:0, l:0, t:0 }); return M.get(id); };
+  DB.schedule.forEach(g=>{
+    if (g.completed !== 1) return;
+    if (DB.season != null && isFinite(g.season) && g.season !== DB.season) return;
+    const hp = val(g.home_points), ap = val(g.away_points);
+    if (hp == null || ap == null) return;
+    if (isFinite(g.home_id)) { const r = slot(g.home_id); if (hp>ap) r.w++; else if (hp<ap) r.l++; else r.t++; }
+    if (isFinite(g.away_id)) { const r = slot(g.away_id); if (ap>hp) r.w++; else if (ap<hp) r.l++; else r.t++; }
+  });
+}
+/* One record string per team, labelled by which season it describes. Showing last
+   season's record with no label - which is what this page used to do - reads as the
+   current one to anyone who does not know the field name. */
+function recordOf(id, rec25){
+  const r = DB.rec26.get(id);
+  if (r && (r.w + r.l + r.t) > 0){
+    return { txt: r.w + '-' + r.l + (r.t ? '-' + r.t : ''), cur:true,
+      tip: (DB.season || 'This season') + ' to date, counted from completed games in the Schedule table' +
+           (has(rec25) ? '. ' + ((DB.season||2026) - 1) + ' final: ' + rec25 : '') };
+  }
+  if (!has(rec25)) return null;
+  return { txt: rec25, cur:false,
+    tip: ((DB.season||2026) - 1) + ' final record. No ' + (DB.season||'current') + ' games completed yet.' };
+}
+const recSpan = r => r ? '<span title="'+esc(r.tip)+'">'+esc(r.txt) +
+  (r.cur ? '' : ' <span class="dim">\u2019' + String(((DB.season||2026)-1)).slice(2) + '</span>') + '</span>' : '';
+
 function buildSlateRows(){
   const lines = buildLineIndex();
   DB.slate = DB.schedule
     .filter(g => g.season_type === 'regular' && isFinite(g.week))
     .map(g => slateRow(g, lines));
-  DB.slate.forEach(g=>{ g._w = watchability(g); g._trip = tripMiles(g); g._k = kickoff(g); g._day = g._k.day; });
+  DB.slate.forEach(g=>{
+    g._w = watchability(g); g._trip = tripMiles(g); g._k = kickoff(g); g._day = g._k.day;
+    /* a recap only exists for a game that has been played AND made the archive -
+       FBS in full, a slice of FCS, no D2 or D3 at all */
+    g._r = (g.completed === 1) ? (DB.recap.get(g.game_id) || null) : null;
+    g._rec_h = recordOf(g.home_team_id, g.home_record25);
+    g._rec_a = recordOf(g.away_team_id, g.away_record25);
+  });
   const cw = DB.week ? DB.week.week : null;
   DB.games = DB.slate.filter(g => g.week === cw);   // "this week" for Home and Home Turf
 }
@@ -2307,7 +2483,7 @@ function drawSlate(){
     const home = DB.byId.get(x.home_team_id);
     L.circleMarker([x._g.y,x._g.x],{radius:6,color:'#0A1E31',weight:1.5,
       fillColor: vizColor(home ? teamColor(home) : (has(x.home_color)?x.home_color:'#5A7285')), fillOpacity:.9})
-      .bindPopup('<b>'+esc(x.matchup)+'</b><br>'+esc(x._k.full)+'<br>'+esc(x.venue)+'<br>Watchability '+x._w.score)
+      .bindPopup(slatePopup(x))
       .on('click',()=>{ const card=$('#slate-grid .game[data-gid="'+x.game_id+'"]');
         if(card){ $$('#slate-grid .game').forEach(c=>c.classList.remove('hi')); card.classList.add('hi'); card.scrollIntoView({behavior:'smooth',block:'center'}); }})
       .addTo(slLayer);
@@ -2317,6 +2493,101 @@ function drawSlate(){
     try{ const b = L.latLngBounds(slBounds).pad(.12); rememberBounds(slMap, b); slMap.fitBounds(b,{ animate:false, maxZoom:9 }); }catch(e){}
   }
 }
+/* The map popup answers the same question as the card, in a fifth of the space:
+   who is playing, how they stand right now, and - if it is over - who won and what
+   Tux made of it. It used to be four lines of plain text with no record and no result. */
+function slatePopup(x){
+  const r = x._r, fin = x.completed === 1 && val(x.home_points) != null && val(x.away_points) != null;
+  const side = (isHome) => {
+    const nm  = isHome ? x.home_school : x.away_school;
+    const rec = isHome ? x._rec_h : x._rec_a;
+    const lg  = isHome ? x.home_logo_url : x.away_logo_url;
+    const pts = isHome ? val(x.home_points) : val(x.away_points);
+    const opp = isHome ? val(x.away_points) : val(x.home_points);
+    const lost = fin && pts != null && opp != null && pts < opp;
+    return '<div class="prow'+(lost?' lost':'')+'">' + logoChip(lg,'xs') +
+      '<span class="nm">'+esc(nm)+'</span>' +
+      (rec ? '<span class="rc" title="'+esc(rec.tip)+'">'+esc(rec.txt)+(rec.cur?'':' \u2019'+String(((DB.season||2026)-1)).slice(2))+'</span>' : '') +
+      (fin ? '<span class="pt">'+(pts==null?dash:pts)+'</span>' : '') + '</div>';
+  };
+  const meta = fin
+    ? outcomeLine(x, r) + ' &middot; ' + esc(x.venue)
+    : esc(x._k.full) + '<br>' + esc(x.venue) + (has(x.tv_outlet) ? ' &middot; ' + esc(x.tv_outlet) : '');
+  return '<div class="pop">' + side(false) + side(true) +
+    '<div class="pmeta">'+meta+'</div>' +
+    '<div class="pfoot">' +
+      '<span class="tflag" title="Watchability - this page\u2019s pregame index.">watch '+x._w.score+'</span>' +
+      (r ? gradeBadge(r.tux_grade) : '') +
+      (r && val(r.aftermath_index)!=null ? '<span class="tflag" title="Aftermath Index from Tux\u2019s Take.">delivered '+r.aftermath_index+'</span>' : '') +
+    '</div>' +
+    (r ? '<div class="pfoot"><a class="tbtn" href="'+tuxGameUrl(x.game_id)+'" target="_blank" rel="noopener">Read Tux\u2019s Take \u2192</a></div>' : '') +
+  '</div>';
+}
+
+/* Tux's grade is a LETTER, stored by the recap notebook from the excitement
+   percentile within that game's own week. It is not recomputed here - it is quoted,
+   with a link to the app that defines it. */
+function gradeClass(gr){
+  const c = String(gr||'').charAt(0).toUpperCase();
+  return c==='A' ? 'g-a' : c==='B' ? 'g-b' : c==='C' ? 'g-c' : c==='D'||c==='F' ? 'g-d' : 'g-c';
+}
+function gradeBadge(gr){
+  if (!has(gr)) return '';
+  return '<span class="tgrade '+gradeClass(gr)+'" title="Tux grade, from Tux\u2019s Take: the CFBD excitement ' +
+    'index expressed as a percentile within that game\u2019s own week. A letter, not a number this page computed.">' +
+    'Tux <b>'+esc(gr)+'</b></span>';
+}
+/* The outcome in one clause. The scores are already beside the team names, so the
+   thing worth adding is WHO won and BY HOW MUCH - plus overtime, which the score
+   line alone cannot tell you. */
+function outcomeLine(g, r){
+  const hp = val(g.home_points), ap = val(g.away_points);
+  if (hp == null || ap == null) return '';
+  if (hp === ap) return 'Tied ' + hp + '-' + ap;
+  const winner = hp > ap ? g.home_school : g.away_school;
+  const by = Math.abs(hp - ap);
+  return esc(winner) + ' by ' + by + (r && r.went_ot === 1 ? ' \u00b7 OT' : '');
+}
+/* PROMISE vs DELIVERY.
+   Watchability is a PREGAME index over the games on one slate. The Aftermath Index
+   is a POSTGAME index over games already played. They share a 0-100 scale and
+   nothing else, so this only ever flags a gap wide enough to survive that caveat,
+   and the caveat is in the tooltip. */
+const GAP = 25;
+function deliveryFlag(watch, after){
+  if (after == null || watch == null) return '';
+  const tip = 'Watchability is scored before kickoff from the matchup; the Aftermath Index is scored ' +
+    'after the fact from what happened. Different components on a shared 0-100 scale - flagged only at ' +
+    'a gap of ' + GAP + ' or more, never treated as a subtraction.';
+  if (after - watch >= GAP) return '<span class="tflag over" title="'+esc(tip)+'">beat its billing</span>';
+  if (watch - after >= GAP) return '<span class="tflag under" title="'+esc(tip)+'">did not deliver</span>';
+  return '';
+}
+/* The whole postgame block. Renders nothing at all when there is no archive row -
+   a D3 game, or one played since the last weekly rebuild - rather than an empty
+   shell with dashes in it. */
+function tuxBlock(g){
+  const r = g._r;
+  if (!r) return '';
+  const idx = val(r.aftermath_index);
+  const bits =
+    gradeBadge(r.tux_grade) +
+    '<span class="tres">'+outcomeLine(g, r)+'</span>' +
+    (r.upset === 1 ? '<span class="tflag">upset</span>' : '') +
+    deliveryFlag(g._w ? g._w.score : null, idx) +
+    (idx != null ? '<span class="tidx" title="Aftermath Index from Tux\u2019s Take: seven weighted ' +
+      'postgame components. ' + (has(r.index_why) ? esc(r.index_why) + '. ' : '') +
+      'Missing components leave the denominator.">delivered <b>'+idx+'</b></span>' : '');
+  return '<div class="tux">' +
+    '<div class="tuxrow">'+bits+'</div>' +
+    (has(r.headline) ? '<div class="thead">'+esc(r.headline)+'</div>' : '') +
+    (has(r.money_line) ? '<div class="tquote">\u201c'+esc(r.money_line)+'\u201d</div>' : '') +
+    '<a class="tbtn" href="'+tuxGameUrl(g.game_id)+'" target="_blank" rel="noopener" ' +
+      'title="Opens Tux\u2019s Take on this exact game - full box score, quarter by quarter, the market, and who wrote the recap.">' +
+      'Read Tux\u2019s Take on this game \u2192</a>' +
+  '</div>';
+}
+
 function gameCard(g){
   const ca = vizColor(has(g.away_color)?g.away_color:'#5A7285'), ch = vizColor(has(g.home_color)?g.home_color:'#5A7285');
   /* Five polls publish now, so a bare "#1" is a lie - a D2 leader is not a
@@ -2331,11 +2602,11 @@ function gameCard(g){
     '<div class="gtop">' +
       '<div class="gteam">'+logoChip(g.away_logo_url,'md',true) +
         '<div style="min-width:0"><div class="s">'+pill(iA)+esc(g.away_school)+(fin?sc(wonA)+g.away_points+'</span>':'')+'</div>' +
-        '<div class="m">'+esc(g.away_conf||'')+(has(g.away_record25)?' &middot; '+esc(g.away_record25):'')+'</div></div></div>' +
+        '<div class="m">'+esc(g.away_conf||'')+(g._rec_a?' &middot; '+recSpan(g._rec_a):'')+'</div></div></div>' +
       '<div class="vs">'+(g.neutral_site===1?'VS<br><span style="font-size:9px">neutral</span>':'AT')+'</div>' +
       '<div class="gteam h">'+logoChip(g.home_logo_url,'md',true) +
         '<div style="min-width:0"><div class="s">'+pill(iH)+esc(g.home_school)+(fin?sc(wonH)+g.home_points+'</span>':'')+'</div>' +
-        '<div class="m">'+esc(g.home_conf||'')+(has(g.home_record25)?' &middot; '+esc(g.home_record25):'')+'</div></div></div>' +
+        '<div class="m">'+esc(g.home_conf||'')+(g._rec_h?' &middot; '+recSpan(g._rec_h):'')+'</div></div></div>' +
     '</div>' +
     '<div class="gmeta">' +
       (fin?'<span class="gfinal">FINAL</span>':'') +
@@ -2349,6 +2620,7 @@ function gameCard(g){
     '<div class="watch"><span class="tiny dim" style="letter-spacing:.1em;text-transform:uppercase">Watchability</span>' +
       '<div class="meter"><i style="width:'+w.score+'%"></i></div><span class="sc num">'+w.score+'</span></div>' +
     '<div class="why">'+whyLine(g,w)+'</div>' +
+    tuxBlock(g) +
   '</article>';
 }
 
@@ -2658,7 +2930,9 @@ function drawPollMap(rk, maxPts){
     if (!t || !isFinite(t.latitude)) return;
     const m = L.circleMarker([t.latitude,t.longitude], {
       radius:8, color:'#0A1E31', weight:2, fillColor:vizColor(teamColor(t)), fillOpacity:.92
-    }).bindTooltip('#'+r.rank+' '+t.school + (has(r.points)?' \u00b7 '+r.points.toLocaleString()+' pts':''), {direction:'top'})
+    }).bindTooltip('#'+r.rank+' '+t.school +
+        (DB.rec26.has(t.team_id) ? ' \u00b7 ' + (x=>x.w+'-'+x.l+(x.t?'-'+x.t:''))(DB.rec26.get(t.team_id)) : '') +
+        (has(r.points)?' \u00b7 '+r.points.toLocaleString()+' pts':''), {direction:'top'})
       .on('click', ()=> openDossier(t.team_id))
       .addTo(grp);
     pollMarks.set(r.team_id, m);
@@ -2693,7 +2967,15 @@ function buildAbout(){
     ['Chief rival',      nT('rival_school'), T, 'Teams'],
     ['Packed schedule',  nT('schedule_str'), T, 'Teams'],
     ['Betting lines',    DB.games.filter(g=>has(g.spread)).length, G, 'Betting Lines \u00d7 week ' + (DB.week?DB.week.week:'-')],
-    ['Final scores',     DB.schedule.filter(g=>g.completed===1).length, S, 'Schedule']
+    ['Final scores',     DB.schedule.filter(g=>g.completed===1).length, S, 'Schedule'],
+    /* Recap coverage is the honest denominator for the postgame block: completed
+       games in the schedule, against completed games that made the archive. */
+    ['Recap archive',    DB.recapOk ? DB.slate.filter(g=>g._r).length : 0,
+                         DB.slate.filter(g=>g.completed===1).length || 1,
+                         DB.recapOk ? 'Recaps \u00d7 completed games' : 'Recaps unavailable'],
+    ['Tux grades',       DB.recapOk ? DB.slate.filter(g=>g._r && has(g._r.tux_grade)).length : 0,
+                         DB.slate.filter(g=>g.completed===1).length || 1,
+                         DB.recapOk ? 'Recaps' : 'Recaps unavailable']
   ];
   $('#honesty').innerHTML = items.map(([lab,c,tot,src])=>{
     const empty = c===0;
@@ -2704,7 +2986,7 @@ function buildAbout(){
   }).join('');
 
   /* grouped by service, then by layer id inside it */
-  const SVC_ORDER = ['CFB Atlas Teams','CFB Atlas Territories','CFB Atlas Stats',
+  const SVC_ORDER = ['CFB Atlas Teams','CFB Atlas Territories','CFB Atlas Stats','CFB Atlas Recaps',
                      'CFB Atlas Games This Week','CFB Atlas Recruiting','CFB Atlas Travel'];
   const ordered = SERVICE_DOCS.slice().sort((a,b)=>{
     const d = SVC_ORDER.indexOf(a.svc) - SVC_ORDER.indexOf(b.svc);
@@ -2738,7 +3020,7 @@ function buildAbout(){
     tile(nfmt(DB.teams.length), 'programs') +
     tile(nfmt(3144), 'counties modeled') +
     tile(nfmt(DB.schedule.length), 'games') +
-    tile(String(SERVICE_DOCS.length), 'layers read');
+    tile(String(SERVICE_DOCS.filter(x=>x.read!==false).length), 'layers read live');
 }
 
 /* ---------- 8. boot --------------------------------------------------- */
