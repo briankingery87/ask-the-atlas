@@ -98,6 +98,13 @@ const COUNTY = {
 };
 
 const RANKINGS = [
+  /* WEEK 1 - the preseason release. Must NOT appear on the board when week 2 exists,
+     and must not pin a team's rank pill to its preseason number. */
+  {season:2026, week:1, poll:'AP Top 25', rank:3, team_id:194, school:'Ohio State', conference:'Big Ten', points:1400, first_votes:2},
+  {season:2026, week:1, poll:'AP Top 25', rank:12, team_id:130, school:'Michigan', conference:'Big Ten', points:800, first_votes:0},
+  {season:2026, week:1, poll:'Coaches Poll', rank:4, team_id:194, school:'Ohio State', conference:'Big Ten', points:1500, first_votes:1},
+  {season:2026, week:1, poll:'AFCA Division II Coaches Poll', rank:2, team_id:2229, school:'Ferris State', conference:'GLIAC', points:450, first_votes:3},
+  /* WEEK 2 - the latest release, and the one the home strip must open on */
   {season:2026, week:2, poll:'AP Top 25', rank:1, team_id:194, school:'Ohio State', conference:'Big Ten', points:1550, first_votes:60},
   {season:2026, week:2, poll:'AP Top 25', rank:7, team_id:130, school:'Michigan', conference:'Big Ten', points:1100, first_votes:0},
   {season:2026, week:2, poll:'Coaches Poll', rank:2, team_id:194, school:'Ohio State', conference:'Big Ten', points:1741, first_votes:38},
@@ -169,6 +176,7 @@ const feat = (attrs, geometry) => geometry ? { attributes:attrs, geometry } : { 
   const page = await browser.newPage();
   const errors = [], console_errors = [];
   let gtwHits = 0;
+  let rankPages = 0;
   page.on('pageerror', e => errors.push((e.stack||String(e)).split('\n').slice(0,9).join(' >> ')));
   page.on('console', m => { if (m.type()==='error') console_errors.push(m.text()); });
 
@@ -200,7 +208,14 @@ const feat = (attrs, geometry) => geometry ? { attributes:attrs, geometry } : { 
     } else if (/CFB_Atlas_Stats\/FeatureServer\/0/.test(all)) {
       body = { features: SCHEDULE.map(x=>feat(x)) };
     } else if (/CFB_Atlas_Stats\/FeatureServer\/1/.test(all)) {
-      body = { features: RANKINGS.map(x=>feat(x)) };
+      /* Deliberately served in two pages with the server's own more-to-come flag, so
+         a regression that stops paging loses half the poll rows and fails loudly. */
+      const m = all.match(/resultOffset=(\d+)/);
+      const off = m ? +m[1] : 0;
+      rankPages++;
+      const slice = RANKINGS.slice(off, off + 6);
+      body = { features: slice.map(x=>feat(x)),
+               exceededTransferLimit: off + 6 < RANKINGS.length };
     } else if (/CFB_Atlas_Stats\/FeatureServer\/2/.test(all)) {
       body = { features: RATINGS.map(x=>feat(x)) };
     } else if (/CFB_Atlas_Recaps\/FeatureServer\/0/.test(all)) {
@@ -229,7 +244,27 @@ const feat = (attrs, geometry) => geometry ? { attributes:attrs, geometry } : { 
   out.home_status = await page.locator('#home-status .tile').count();
   out.home_qcards = await page.locator('#home-questions .qcard').count();
   out.home_poll   = await page.locator('#home-poll .pollrow').count();
-  out.home_polllab= await page.textContent('#poll-label');
+  out.home_polllab= (await page.textContent('#poll-label')).replace(/\s+/g,' ').trim();
+  out.poll_week_default = await page.inputValue('#poll-week').catch(()=>'none');
+  out.poll_week_opts = await page.locator('#poll-week option').allTextContents();
+  out.poll_rows = await page.locator('#home-poll .pollrow').allTextContents();
+  out.poll_dupes = await page.evaluate(()=>{
+    const n = [...document.querySelectorAll('#home-poll .pollrow')].map(r=>r.dataset.tid);
+    return n.length - new Set(n).size;               // must be 0
+  });
+  // paging back to week 1 must show the PRESEASON ranks
+  await page.selectOption('#poll-week','2026-1');
+  await page.waitForTimeout(250);
+  out.poll_wk1_rows = await page.locator('#home-poll .pollrow').allTextContents();
+  await page.selectOption('#poll-week','2026-2');
+  await page.waitForTimeout(250);
+  // switching poll resets to that poll's own latest release
+  await page.selectOption('#poll-pick','AFCA Division II Coaches Poll');
+  await page.waitForTimeout(250);
+  out.poll_d2_week = await page.inputValue('#poll-week').catch(()=>'none');
+  out.poll_d2_rows = await page.locator('#home-poll .pollrow').allTextContents();
+  await page.selectOption('#poll-pick','AP Top 25');
+  await page.waitForTimeout(250);
   out.home_pollmap= await page.locator('#map-poll .leaflet-container, #map-poll.leaflet-container').count();
   out.home_pollmarks = await page.locator('#map-poll path.leaflet-interactive').count();
   out.home_qnums = await page.locator('#home-questions .qnum').count();
@@ -498,6 +533,23 @@ const feat = (attrs, geometry) => geometry ? { attributes:attrs, geometry } : { 
   out.foot_stamp  = (await page.textContent('#foot-stamp')).replace(/\s+/g,' ').trim();
 
   out.tux_sibling_card = await page.locator('.split.three > .card').count();
+  // ---- the dossier shows the season with results ----
+  await page.click('nav.modes button[data-mode="home"]');
+  await page.waitForTimeout(250);
+  await page.click('#home-poll .pollrow');
+  await page.waitForTimeout(400);
+  out.dossier_open    = await page.locator('#drawer.on').count();
+  out.dossier_head    = await page.textContent('#drawer-body h4');
+  out.dossier_wl      = await page.locator('#drawer-body .wl').allTextContents();
+  out.dossier_res     = await page.locator('#drawer-body td.res').allTextContents();
+  out.dossier_tuxlink = await page.getAttribute('#drawer-body a.tuxlink','href').catch(()=>'none');
+  out.dossier_tiles   = await page.locator('#drawer-body .tiles .tile').allTextContents();
+  await page.locator('#drawer').screenshot({ path:'/home/claude/ata/shot-dossier.png' });
+  await page.click('#dclose');
+  await page.waitForTimeout(200);
+
+  out.rankings_pages = rankPages;      // must be > 1: the offset loop ran
+  out.rankings_loaded = await page.evaluate(()=> DB.rankings.length);
   out.gamesThisWeek_reads = gtwHits;   // must be 0
   out.pageerrors = errors;
   out.console_errors = console_errors.filter(t => !/net::ERR|Failed to load resource/.test(t));

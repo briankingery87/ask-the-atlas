@@ -892,6 +892,15 @@ td.n .bar{position:absolute;left:0;bottom:0;height:2px;background:var(--viz-1);o
 table.mini{width:100%;border-collapse:collapse;font-size:12px}
 table.mini th{text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding:5px 6px;border-bottom:1px solid var(--line-strong)}
 table.mini td{padding:5px 6px;border-bottom:1px solid var(--line)}
+/* result column in the dossier schedule */
+.wl{display:inline-block;font-weight:900;border-radius:4px;padding:0 5px;font-size:11px;margin-right:5px}
+.wl.w{background:rgba(47,161,115,.18);color:#57C79A}
+.wl.l{background:rgba(224,89,42,.16);color:#F08A5D}
+.wl.t{background:rgba(159,182,198,.18);color:#C4D4DE}
+td.res{white-space:nowrap;font-variant-numeric:tabular-nums}
+a.tuxlink{text-decoration:none;color:var(--accent);font-weight:800;white-space:nowrap}
+a.tuxlink:hover{text-decoration:underline}
+tr.played td{background:rgba(77,195,232,.045)}
 
 /* ---------- SLATE ---------- */
 .slate-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(390px,1fr));gap:12px}
@@ -1320,7 +1329,7 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
 
   <div class="grid" style="grid-template-columns:520px 1fr;gap:14px;align-items:stretch" id="poll-wrap">
     <div class="card" style="margin-top:0">
-      <h3>This week in the poll <span id="poll-label"></span></h3>
+      <h3>In the poll <span id="poll-label"></span></h3>
       <div class="clickhint" style="margin-bottom:10px">
         <b>Every row is a live link.</b> Click any team to open its full dossier - five-season history, the unpacked
         2026 schedule, the researched program narrative, mascot and fan-base story. Hover to preview.
@@ -1753,7 +1762,7 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
       hides what is still placeholder.</p>
       <ul class="road">
         <li><b>Results and records</b> - the schedule table carries scores and a completed flag. Week 1 flips them on, and the Gauntlet turns from a preview into a running tally.</li>
-        <li><b>The AP poll</b> - only the Coaches Poll has published so far. Rank pills, the poll strip and star power all read AP first and fall back to Coaches, so AP appears the moment it lands.</li>
+        <li><b>Poll history</b> - every release of all five polls is in the table and the home strip can page back through them, but nothing yet charts a team's week-to-week movement. Biggest risers and fallers is the obvious next cut.</li>
         <li><b>SP+, Elo and SRS</b> - the Ratings table already has the columns; CFBD has not filled them for 2026. The Tale of the Tape has the rows waiting and greyed.</li>
         <li><b>Recruiting</b> - 3,051 mapped commits and 2,139 origin-destination flows are published and unused here so far. A "where does the talent come from" page is the obvious next question.</li>
         <li><b>The Rewind</b> - a Sunday-morning counterpart to the Slate: what actually happened, biggest upsets against the line, and which counties changed hands.</li>
@@ -2055,13 +2064,16 @@ const rows = j => (j.features||[]).map(f => Object.assign({}, f.attributes, f.ge
    so it is read with the offset loop rather than one hopeful request. */
 async function qAll(url, params){
   const out = [];
-  const page = 2000;
-  for (let off = 0; off < 20000; off += page){
-    const j = await q(url, Object.assign({}, params, { resultOffset:off, resultRecordCount:page }));
+  const page = 2000;                    // requested; the server clamps to its own maxRecordCount
+  for (let i = 0; i < 25; i++){
+    const j = await q(url, Object.assign({}, params, { resultOffset:out.length, resultRecordCount:page }));
     const r = rows(j);
     out.push.apply(out, r);
-    if (r.length < page || j.exceededTransferLimit === false) break;
-    if (!r.length) break;
+    /* STOP ON THE SERVER'S OWN SIGNAL, not on a page size we guessed. Every layer
+       here caps at 2000 today, but if one is ever republished with a lower cap a
+       "did I get fewer than I asked for" test would quietly truncate instead of
+       paging. exceededTransferLimit is the layer telling us there is more. */
+    if (!r.length || j.exceededTransferLimit !== true) break;
   }
   return out;
 }
@@ -2114,7 +2126,9 @@ const DB = { teams:[], byId:new Map(), byName:new Map(), empires:new Map(), game
   /* recap = one merged row per completed game, joined from the two Recaps layers.
      rec26 = each team's record SO FAR THIS SEASON, derived here from completed
      schedule rows because no published field carries it. */
-  recap:new Map(), recapOk:false, recapErr:null, rec26:new Map(), season:null };
+  recap:new Map(), recapOk:false, recapErr:null, rec26:new Map(), season:null,
+  /* poll -> [{season,week}] newest first; pollRel = the release being shown */
+  pollWeeks:new Map(), pollRel:null };
 
 async function loadAll(){
   const stamp = $('#loadstate');
@@ -2132,16 +2146,26 @@ async function loadAll(){
 
   step('Loading polls, ratings and the calendar');
   const [rk, rt, cal] = await Promise.all([
-    q(SVC.rankings, { where:'1=1', outFields:'season,week,poll,rank,team_id,school,conference,points,first_votes', orderByFields:'rank ASC', resultRecordCount:400 }),
+    /* PAGED, and ordered newest-week-first. Rankings is long format and grows by
+       ~125 rows EVERY WEEK - five polls of 25. The old single request capped at 400
+       and sorted by rank, so from about week four the tail of the newest poll would
+       have been silently dropped while week 1 rows survived. */
+    qAll(SVC.rankings, { where:'1=1', outFields:'season,week,poll,rank,team_id,school,conference,points,first_votes',
+                         orderByFields:'season DESC, week DESC, poll ASC, rank ASC' }),
     q(SVC.ratings,  { where:'1=1', outFields:'team_id,school,season,sp_overall,sp_offense,sp_defense,elo,srs,fpi', resultRecordCount:1000 }),
     q(SVC.calendar, { where:'1=1', outFields:'season,week,season_type,first_game,last_game', orderByFields:'week ASC', resultRecordCount:100 })
   ]);
-  DB.rankings = rows(rk); DB.calendar = rows(cal);
+  DB.rankings = rk; DB.calendar = rows(cal);
+  buildPollWeeks();
   rows(rt).forEach(r=> DB.ratings.set(r.team_id, r));
-  /* Long format: one row per team per poll. Five polls publish now, so pick by
-     the documented order rather than by a loose "coach" match - "AFCA Division
-     II Coaches Poll" matches that too, and would outrank a team's AP row. */
+  /* Long format: one row per team PER POLL PER WEEK. Two things have to be true
+     here and only one of them used to be:
+       1. pick the right POLL - by the documented order, not a loose "coach" match,
+          because "AFCA Division II Coaches Poll" matches that too;
+       2. pick the right WEEK - as of week 2 there are two weeks in the table, and
+          taking whichever row arrived first pinned teams to preseason ranks. */
   DB.rankings.forEach(r=>{
+    if (!isLatestPollRow(r)) return;
     const cur = DB.rankByTeam.get(r.team_id);
     if (!cur || pollOrder(r.poll) < pollOrder(cur.poll)) DB.rankByTeam.set(r.team_id, r);
   });
@@ -2153,12 +2177,12 @@ async function loadAll(){
      schedule carries all fifteen; identity and coordinates come from Teams and
      the price comes from Betting Lines. */
   const [sch, lin] = await Promise.all([
-    q(SVC.schedule, { where:'1=1', resultRecordCount:5000,
+    qAll(SVC.schedule, { where:'1=1', orderByFields:'game_id ASC',
       outFields:'game_id,season,week,season_type,start_date,start_time_tbd,completed,neutral_site,conference_game,venue,home_id,home_team,home_conference,home_division,home_points,away_id,away_team,away_conference,away_division,away_points,tv_outlet' }),
-    q(SVC.lines, { where:'1=1', resultRecordCount:5000,
+    qAll(SVC.lines, { where:'1=1', orderByFields:'game_id ASC',
       outFields:'game_id,week,provider,spread,over_under,formatted' })
   ]);
-  DB.schedule = rows(sch); DB.lines = rows(lin);
+  DB.schedule = sch; DB.lines = lin;
   buildRecords();
 
   step('Loading the recap archive');
@@ -2273,6 +2297,40 @@ function pollList(){
 }
 function preferredPoll(){ return pollList()[0] || null; }
 const pollName = () => DB.pollShown || preferredPoll() || 'Poll';
+
+/* WHICH RELEASE AM I LOOKING AT.
+   Rankings carries every release of every poll, so "the AP Top 25" is not one list -
+   it is one list per week. Polls do not all publish on the same schedule either, so
+   the newest release is resolved PER POLL rather than from a single global max week.
+   A release is keyed "<season>-<week>" and sorts correctly as a pair of numbers. */
+const relKey = r => r.season + '-' + r.week;
+function buildPollWeeks(){
+  const M = DB.pollWeeks; M.clear();
+  DB.rankings.forEach(r=>{
+    if (!has(r.poll) || !isFinite(r.week)) return;
+    const list = M.get(r.poll) || [];
+    if (!list.some(x => x.season === r.season && x.week === r.week))
+      list.push({ season:r.season, week:r.week });
+    M.set(r.poll, list);
+  });
+  M.forEach(list => list.sort((a,b)=> (b.season - a.season) || (b.week - a.week)));
+}
+const pollReleases = poll => DB.pollWeeks.get(poll) || [];
+const latestRelease = poll => pollReleases(poll)[0] || null;
+function isLatestPollRow(r){
+  const L = latestRelease(r.poll);
+  return !!L && r.season === L.season && r.week === L.week;
+}
+/* The release the home strip is showing. Defaults to the newest one for that poll
+   and falls back to it whenever the poll changes to one that has no such week. */
+function shownRelease(){
+  const poll = pollName();
+  const list = pollReleases(poll);
+  if (!list.length) return null;
+  const want = DB.pollRel;
+  const hit = want && list.find(x => relKey(x) === want);
+  return hit || list[0];
+}
 
 /* ---------- 3. HOME TURF -------------------------------------------- */
 let mapT, youMarker, countyLayer, nearLayer;
@@ -2833,12 +2891,70 @@ function drawScreener(){
 
 /* ---------- dossier drawer ------------------------------------------ */
 const narrCache = new Map();
+/* THE PROGRAM'S ACTUAL SEASON.
+   The dossier used to unpack schedule_str off the Teams layer, which is a packed
+   convenience string with no score in it - so a team that had already played read
+   exactly the same as one that had not. The Schedule table carries completed, the
+   points and the game_id, so the season is built from that instead and joined to
+   the recap archive for the grade and the link. schedule_str stays as the fallback
+   for a program the Schedule table does not cover. */
+function teamSeason(id){
+  return DB.slate
+    .filter(g => g.home_team_id === id || g.away_team_id === id)
+    .sort((a,b)=> (a.week - b.week) || ((a.start_date||0) - (b.start_date||0)))
+    .map(g=>{
+      const home = g.home_team_id === id;
+      const mine = val(home ? g.home_points : g.away_points);
+      const theirs = val(home ? g.away_points : g.home_points);
+      const done = g.completed === 1 && mine != null && theirs != null;
+      return { g, home, mine, theirs, done,
+        opp: home ? g.away_school : g.home_school,
+        oppLogo: home ? g.away_logo_url : g.home_logo_url,
+        where: g.neutral_site === 1 ? 'neutral' : home ? 'home' : 'away',
+        wl: !done ? null : mine > theirs ? 'W' : mine < theirs ? 'L' : 'T' };
+    });
+}
+function seasonRecord(list){
+  let w=0,l=0,t=0;
+  list.forEach(x=>{ if (x.wl==='W') w++; else if (x.wl==='L') l++; else if (x.wl==='T') t++; });
+  return { w, l, t, played:w+l+t, str: w+'-'+l+(t?'-'+t:'') };
+}
+function seasonTable(list){
+  const rec = seasonRecord(list);
+  const rows = list.map(x=>{
+    const r = x.g._r;
+    const grade = r && has(r.tux_grade) ? ' <span class="dim">'+esc(r.tux_grade)+'</span>' : '';
+    const result = x.done
+      ? '<span class="wl '+x.wl.toLowerCase()+'">'+x.wl+'</span>'+x.mine+'-'+x.theirs +
+        (r ? ' <a class="tuxlink" href="'+tuxGameUrl(x.g.game_id)+'" target="_blank" rel="noopener" ' +
+             'title="Open this game in Tux\u2019s Take - box score, quarter by quarter, and the recap.">Tux'+grade+' \u2192</a>' : '')
+      : '<span class="dim">'+esc(x.g._k.tbd ? x.g._k.day : x.g._k.day + ' \u00b7 ' + x.g._k.time)+'</span>';
+    return '<tr'+(x.done?' class="played"':'')+'><td>'+x.g.week+'</td>' +
+      '<td>'+logoChip(x.oppLogo,'xs',true)+' '+esc(x.opp)+'</td>' +
+      '<td>'+x.where+'</td>' +
+      '<td class="res">'+result+'</td>' +
+      '<td>'+(has(x.g.tv_outlet)?esc(x.g.tv_outlet):'<span class="dim">'+dash+'</span>')+'</td></tr>';
+  }).join('');
+  return '<h4 style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin:18px 0 6px">' +
+    (DB.season || 2026) + ' season <span class="dim" style="letter-spacing:0;text-transform:none">(' +
+    (rec.played ? '<b>'+rec.str+'</b> through ' + rec.played + ' game' + (rec.played===1?'':'s') + ', ' : '') +
+    list.length + ' scheduled)</span></h4>' +
+    '<table class="mini"><tr><th>Wk</th><th>Opponent</th><th>Where</th><th>Result</th><th>TV</th></tr>' +
+    rows + '</table>' +
+    (rec.played
+      ? '<div class="tiny dim" style="margin-top:5px">Record is counted from completed games in the Schedule table. ' +
+        'A <b>Tux</b> link opens that game\u2019s full recap; games with no link are not in the recap archive ' +
+        '(Division II and III are absent rather than empty).</div>'
+      : '');
+}
+
 async function openDossier(id){
   const t = DB.byId.get(id); if(!t) return;
   const d = $('#drawer'), body = $('#drawer-body');
   d.classList.add('on'); $('#scrim').classList.add('on'); d.setAttribute('aria-hidden','false');
   const c = teamColor(t), ink = contrastInk(c);
   const hist = parseHistory(t.history_str), sched = parseSchedule(t.schedule_str), e = DB.empires.get(t.team_id);
+  const season = teamSeason(t.team_id), srec = seasonRecord(season);
   body.innerHTML =
     '<div class="dh" style="background:'+c+';color:'+ink+'">' +
       '<button class="closeX" id="dclose">&times;</button>' +
@@ -2852,6 +2968,7 @@ async function openDossier(id){
         tile(val(t.capacity)?Number(t.capacity).toLocaleString():dash,'seats') +
         tile(val(t.year_built)||dash,'built') +
         tile(t._elevft!=null?t._elevft.toLocaleString():dash,'elev ft') +
+        tile(srec.played ? srec.str : dash, String(DB.season || 2026)) +
         tile(has(t.record_2025)?esc(t.record_2025):dash,'2025') +
         tile(val(t.coaches_rank)?'#'+t.coaches_rank:dash,'coaches') +
         tile(val(t.recruiting_rank)?'#'+t.recruiting_rank:dash,'recruiting') +
@@ -2864,7 +2981,8 @@ async function openDossier(id){
       (hist.length?'<h4 style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin:18px 0 6px">Five seasons</h4>' +
         '<table class="mini"><tr><th>Year</th><th>Record</th><th>AP</th></tr>' +
         hist.slice().reverse().map(h=>'<tr><td>'+h.year+'</td><td>'+esc(h.record||dash)+'</td><td>'+(h.rank?'#'+h.rank:'<span class="dim">'+dash+'</span>')+'</td></tr>').join('') + '</table>':'') +
-      (sched.length?'<h4 style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin:18px 0 6px">2026 schedule <span class="dim" style="letter-spacing:0;text-transform:none">('+sched.length+' games, unpacked from schedule_str)</span></h4>' +
+      (season.length ? seasonTable(season)
+        : sched.length?'<h4 style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin:18px 0 6px">2026 schedule <span class="dim" style="letter-spacing:0;text-transform:none">('+sched.length+' games, unpacked from schedule_str - no scores in this field)</span></h4>' +
         '<table class="mini"><tr><th>Wk</th><th>Opponent</th><th>Where</th><th>Date</th><th>TV</th></tr>' +
         sched.map(g=>'<tr><td>'+g.week+'</td><td>'+esc(g.opp)+'</td><td>'+esc(g.loc==='vs'?'home':g.loc==='at'?'away':g.loc||'')+'</td><td>'+esc(g.date)+'</td><td>'+(has(g.tv)?esc(g.tv):'<span class="dim">'+dash+'</span>')+'</td></tr>').join('') + '</table>':'') +
       '<div class="narr" id="d-narr"><div class="tiny dim" style="margin-top:18px">Loading the program dossier&hellip;</div></div>' +
@@ -3527,7 +3645,7 @@ function buildHome(){
   /* Rankings is long format - one row per team per poll - so a raw row count
      double-counts a team that appears in two. Count distinct teams, and say
      across how many polls. */
-  const rankedTeams = new Set(DB.rankings.filter(r=>r.rank>0).map(r=>r.team_id)).size;
+  const rankedTeams = new Set(DB.rankings.filter(r=>r.rank>0 && isLatestPollRow(r)).map(r=>r.team_id)).size;
   const nPolls = pollList().length;
   const slateLab = wk ? 'games in week ' + wk.week : 'games on the slate';
   $('#home-status').innerHTML =
@@ -3548,18 +3666,41 @@ function buildHome(){
       '<div class="go">Open '+esc(x.label)+' <span>&rarr;</span></div>' +
     '</button>').join('');
 
-  /* poll strip */
+  /* poll strip.
+     SCOPED TO ONE RELEASE. Rankings holds every week of every poll, so filtering on
+     the poll alone returned week 1 AND week 2 stacked together - which is why the
+     number one team appeared twice and the label read "week 1". It now opens on the
+     newest release for the chosen poll and offers the earlier ones in a picker. */
   if (!DB.pollShown) DB.pollShown = preferredPoll();
   const polls = pollList();
-  const pollWk = DB.rankings.find(r=>r.poll===DB.pollShown);
-  $('#poll-label').innerHTML = esc(pollName()) + (pollWk ? ' &middot; week ' + pollWk.week : '') +
+  const rel = shownRelease();
+  DB.pollRel = rel ? relKey(rel) : null;
+  const releases = pollReleases(pollName());
+  const sel = (id, opts) => '<select id="'+id+'" style="padding:2px 6px;font-size:11px">' + opts + '</select>';
+  $('#poll-label').innerHTML =
     (polls.length > 1
-      ? ' &middot; <select id="poll-pick" style="padding:2px 6px;font-size:11px">' +
-        polls.map(x=>'<option'+(x===DB.pollShown?' selected':'')+'>'+esc(x)+'</option>').join('') + '</select>'
+      ? sel('poll-pick', polls.map(x=>'<option'+(x===DB.pollShown?' selected':'')+'>'+esc(x)+'</option>').join(''))
+      : esc(pollName())) +
+    (releases.length
+      ? ' &middot; ' + (releases.length > 1
+          ? sel('poll-week', releases.map((x,i)=>'<option value="'+relKey(x)+'"'+(relKey(x)===DB.pollRel?' selected':'')+'>' +
+              'Week ' + x.week + (i===0 ? ' \u00b7 latest' : '') + '</option>').join(''))
+          : 'week ' + releases[0].week)
       : '');
-  const rk = DB.rankings.filter(r=>r.rank>0 && r.poll===DB.pollShown).sort((a,b)=>a.rank-b.rank);
+  const rk = DB.rankings
+    .filter(r => r.rank > 0 && r.poll === DB.pollShown && rel && r.season === rel.season && r.week === rel.week)
+    .sort((a,b)=>a.rank-b.rank);
   const box = $('#home-poll');
-  if (!rk.length){ box.innerHTML = '<div class="tiny dim">No poll has published yet this season.</div>'; return; }
+  if (!rk.length){
+    box.innerHTML = '<div class="tiny dim">' + (releases.length
+      ? 'No rows for ' + esc(pollName()) + ' in that week.'
+      : 'No poll has published yet this season.') + '</div>';
+    const p2 = $('#poll-pick');
+    if (p2) p2.onchange = e => { DB.pollShown = e.target.value; DB.pollRel = null; buildHome(); };
+    const w2 = $('#poll-week');
+    if (w2) w2.onchange = e => { DB.pollRel = e.target.value; buildHome(); };
+    return;
+  }
   const maxPts = Math.max.apply(null, rk.map(r=>has(r.points)?r.points:0)) || 1;
   box.innerHTML = rk.map(r=>{
     const t = DB.byId.get(r.team_id);
@@ -3576,7 +3717,11 @@ function buildHome(){
   }).join('') +
   '<div class="tiny dim" style="margin-top:8px">Bar length is poll points. \u2605 marks first-place votes. Click a row for the program dossier.</div>';
   const pick = $('#poll-pick');
-  if (pick) pick.onchange = e => { DB.pollShown = e.target.value; buildHome(); };
+  /* changing the poll drops the week: the release keys are per poll, and a poll that
+     did not publish in the selected week would otherwise render an empty board */
+  if (pick) pick.onchange = e => { DB.pollShown = e.target.value; DB.pollRel = null; buildHome(); };
+  const wpick = $('#poll-week');
+  if (wpick) wpick.onchange = e => { DB.pollRel = e.target.value; buildHome(); };
   $$('#home-poll .pollrow').forEach(r => {
     r.onclick = ()=> openDossier(+r.dataset.tid);
     r.onmouseenter = ()=> pollHighlight(+r.dataset.tid, true);
