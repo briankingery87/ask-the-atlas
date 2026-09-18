@@ -252,6 +252,38 @@ const feat = (attrs, geometry) => geometry ? { attributes:attrs, geometry } : { 
     const n = [...document.querySelectorAll('#home-poll .pollrow')].map(r=>r.dataset.tid);
     return n.length - new Set(n).size;               // must be 0
   });
+  out.poll_move     = await page.locator('#home-poll .mv').allTextContents();
+  out.poll_dropout  = (await page.textContent('#home-poll .dropout').catch(()=>'none')).replace(/\s+/g,' ').trim();
+  out.poll_filters  = await page.locator('#poll-filters select').count();
+  out.poll_conf_opts= await page.locator('#pf-conf option').allTextContents();
+  // conference filter narrows the board
+  await page.selectOption('#pf-conf','Big Ten');
+  await page.waitForTimeout(200);
+  out.poll_by_conf  = await page.locator('#home-poll .pollrow').count();
+  await page.selectOption('#pf-conf','');
+  await page.waitForTimeout(200);
+  // movement filter: Ohio State went 3 -> 1 (riser), Michigan 12 -> 7 (riser)
+  await page.selectOption('#pf-move','up');
+  await page.waitForTimeout(200);
+  out.poll_risers   = await page.locator('#home-poll .pollrow').count();
+  await page.selectOption('#pf-move','down');
+  await page.waitForTimeout(200);
+  out.poll_fallers  = await page.locator('#home-poll .pollrow').count();
+  out.poll_empty_msg= (await page.textContent('#home-poll')).replace(/\s+/g,' ').trim().slice(0,70);
+  await page.selectOption('#pf-move','');
+  await page.waitForTimeout(200);
+  // the first release of a poll has nothing to move against
+  await page.selectOption('#poll-week','2026-1');
+  await page.waitForTimeout(250);
+  out.poll_wk1_move_disabled = await page.getAttribute('#pf-move','disabled') !== null;
+  await page.selectOption('#poll-week','2026-2');
+  await page.waitForTimeout(250);
+  // the scroll pane must reserve its own gutter so the scrollbar clears the content
+  out.poll_gutter = await page.evaluate(()=>{
+    const n = document.querySelector('#home-poll');
+    const cs = getComputedStyle(n);
+    return { padRight: cs.paddingRight, gutter: cs.scrollbarGutter || 'unsupported' };
+  });
   // paging back to week 1 must show the PRESEASON ranks
   await page.selectOption('#poll-week','2026-1');
   await page.waitForTimeout(250);
@@ -440,6 +472,39 @@ const feat = (attrs, geometry) => geometry ? { attributes:attrs, geometry } : { 
     const rs = [...document.querySelectorAll('#map-slate path.leaflet-interactive')].map(p=>p.getAttribute('d')||'');
     return new Set(rs.map(d=>(d.match(/a([\d.]+),/)||[])[1])).size + ' distinct radii / ' + rs.length + ' dots';
   });
+  await page.locator('#m-slate .filters').screenshot({ path:'/home/claude/ata/shot-slate-filters.png' });
+  out.slate_divs      = await page.locator('#sl-divs .chip').allTextContents();
+  out.slate_div_default = await page.evaluate(()=>
+    [...document.querySelectorAll('#sl-divs .chip')].filter(b=>b.getAttribute('aria-pressed')==='true').map(b=>b.textContent));
+  out.slate_conf_opts = await page.locator('#sl-conf option').allTextContents();
+  out.slate_no_match  = await page.locator('#sl-match').count();       // the old filter is gone
+  /* Both sides on top of FBS alone must drop game 22 - Wyoming hosts D2 Ferris
+     State, so not every participant is FBS. This is the old "FBS vs FBS" option. */
+  await page.click('#sl-both');
+  await page.waitForTimeout(200);
+  out.slate_both_fbs  = await page.locator('#slate-grid .game').count();     // 2, not 3
+  out.slate_count_lbl = (await page.textContent('#sl-count')).replace(/\s+/g,' ').trim();
+  out.slate_week_opts_lens = await page.locator('#sl-week option').allTextContents();
+  await page.click('#sl-both');
+  await page.waitForTimeout(150);
+  // D2 alone: only the game with a D2 participant survives
+  await page.click('#sl-divs .chip[data-div="FBS"]');
+  await page.click('#sl-divs .chip[data-div="D2"]');
+  await page.waitForTimeout(200);
+  out.slate_d2_only   = await page.locator('#slate-grid .game').count();     // 1
+  // deselecting every division means no lens at all - same rule The Screener uses
+  await page.click('#sl-divs .chip[data-div="D2"]');
+  await page.waitForTimeout(200);
+  out.slate_no_div    = await page.locator('#slate-grid .game').count();     // 3, unfiltered
+  await page.click('#sl-divs .chip[data-div="FBS"]');
+  await page.waitForTimeout(200);
+  // conference lens
+  await page.selectOption('#sl-conf','Big Ten');
+  await page.waitForTimeout(200);
+  out.slate_by_conf   = await page.locator('#slate-grid .game').count();
+  out.slate_conf_lbl  = (await page.textContent('#sl-count')).replace(/\s+/g,' ').trim();
+  await page.selectOption('#sl-conf','');
+  await page.waitForTimeout(200);
   out.slate_week_default = await page.inputValue('#sl-week');
   out.slate_week_opts = await page.locator('#sl-week option').allTextContents();
   out.slate_day_opts  = await page.locator('#sl-day option').allTextContents();
