@@ -620,7 +620,25 @@ const feat = (attrs, geometry) => geometry ? { attributes:attrs, geometry } : { 
   await page.click('nav.modes button[data-mode="home"]');
   await page.waitForTimeout(300);
   out.sibling_cards   = await page.locator('.split.four > .card').count();          // 4
-  out.sibling_badges  = await page.locator('.split.four .half-h .badge').allTextContents();
+  /* two badges per card on two different axes: build type left, role right */
+  out.sibling_badges  = await page.evaluate(()=>
+    [...document.querySelectorAll('.split.four > .card')].map(c=>{
+      const b = c.querySelectorAll('.half-h .badge');
+      return (b[0] ? b[0].textContent.trim() : '-') + '  /  ' + (b[1] ? b[1].textContent.trim() : '-');
+    }));
+  out.sibling_titles  = await page.locator('.split.four .cardtitle').allTextContents();
+  out.badges_per_card = await page.evaluate(()=>
+    [...document.querySelectorAll('.split.four > .card')].map(c=>c.querySelectorAll('.half-h .badge').length));
+  /* left badge hugs the left edge, right badge hugs the right - space-between */
+  out.badge_edges = await page.evaluate(()=>
+    [...document.querySelectorAll('.split.four > .card')].map(c=>{
+      const r = c.getBoundingClientRect();
+      const b = c.querySelectorAll('.half-h .badge');
+      if (b.length < 2) return 'one badge';
+      const l = b[0].getBoundingClientRect(), rt = b[1].getBoundingClientRect();
+      return { leftGap: Math.round(l.left - r.left), rightGap: Math.round(r.right - rt.right),
+               sameLine: Math.abs(l.top - rt.top) < 3 };
+    }));
   out.launch_btns     = await page.evaluate(()=>
     [...document.querySelectorAll('.split.four .cardgo a.btn')].map(a=>a.className + ' | ' + a.id));
   out.launch_hrefs    = await page.evaluate(()=>
