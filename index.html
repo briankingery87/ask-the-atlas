@@ -997,9 +997,21 @@ footer.foot b{color:var(--ink-2)}
 .homehero{display:grid;grid-template-columns:1.5fr 1fr;gap:26px;align-items:center}
 .homehero p{max-width:60ch;color:var(--ink-2);margin:12px 0 0;font-size:15px}
 .split{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
-/* The Atlas is three surfaces now, not two: configurable, preview, postgame. */
+/* The Atlas is four surfaces: configurable, preview, postgame, analytics. */
 .split.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+/* FOUR SURFACES. At four across the cards are ~370px on a wide screen, which is
+   narrow enough that the prose has to stay short - see the copy in each card. */
+.split.four{grid-template-columns:repeat(4,minmax(0,1fr))}
 .badge.post{background:rgba(47,161,115,.22);color:#57C79A}
+.badge.film{background:rgba(159,120,232,.22);color:#B79BF0}
+/* Every sibling card ends in the same launch block, and the PRIMARY button is
+   always its last child. Stacking rather than wrapping is what keeps the four
+   primaries on one baseline across the row: a card with a secondary link would
+   otherwise wrap it onto a second line and lift its primary ~44px above the
+   others. Secondary links go first in the DOM for that reason. */
+.cardgo{margin-top:auto;padding-top:12px;display:flex;flex-direction:column;
+  align-items:flex-start;gap:8px}
+.cardgo .btn{display:inline-block;text-decoration:none}
 .split > .card{margin-top:0;display:flex;flex-direction:column}
 .half-h{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .half-h .badge{font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:4px;font-weight:900}
@@ -1162,10 +1174,11 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
   .gauntlet-layout > .card{position:static !important}
   #poll-wrap{grid-template-columns:minmax(0,1fr) !important}
 }
+@media (max-width:1500px){ .split.four{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media (max-width:1250px){ .split.three{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media (max-width:1180px){
   .homehero,.split,.svcrow{grid-template-columns:minmax(0,1fr)}
-  .split.three{grid-template-columns:minmax(0,1fr)}
+  .split.three,.split.four{grid-template-columns:minmax(0,1fr)}
   .hero.big{font-size:38px}
   .authorrow{grid-template-columns:80px minmax(0,1fr);gap:14px}
   .tglogo{grid-column:1/-1;justify-self:start;max-width:170px}
@@ -1289,47 +1302,60 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
     </div>
   </div>
 
-  <div class="split three" style="margin-top:14px">
+  <div class="split four" style="margin-top:14px">
     <div class="card">
       <div class="half-h"><span class="badge cfg">Configurable</span><h3 style="margin:0">The CFB Atlas Experience</h3></div>
-      <p class="muted" style="margin:0 0 12px;font-size:13px">Layer-first. Built in ArcGIS Experience Builder from the same
-      services: pick a view, turn layers on, click a feature, read the popup. Opens in its own tab, at full size.
-      It is the place to <b>explore</b> -
-      fan territories, empires, recruiting flows, travel demand, the Top 25, the core map with everything on it.</p>
+      <p class="muted" style="margin:0 0 12px;font-size:13px">Layer-first. Pick a view, turn layers on, click a feature,
+      read the popup. It is the place to <b>explore</b> - fan territories, empires, recruiting flows, travel demand,
+      the Top 25, the core map with everything on it.</p>
       <ul class="road" style="font-size:12px">
-        <li>Nine web maps and four dashboards, all authored, all configurable</li>
-        <li>Arcade popups carry the narrative, the colors and the placeholder rules</li>
+        <li>Nine web maps and four dashboards, all authored</li>
+        <li>Arcade popups carry the narrative and the placeholder rules</li>
         <li>Changes are made by configuration, not code</li>
       </ul>
-      <div style="margin-top:auto;padding-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-        <a class="btn" id="home-exb" style="display:inline-block;text-decoration:none" target="_blank" rel="noopener" title="Opens the ArcGIS Experience Builder app in a new tab.">Open the Experience &rarr;</a>
-        <a class="btn ghost" style="display:inline-block;text-decoration:none" href="https://experience.arcgis.com/experience/99f6d8062d3943c08aa7728d209060ff/page/Page?views=Making-of-the-Atlas" target="_blank" rel="noopener" title="The build story - how the whole Atlas was made">See how it all started &rarr;</a>
+      <div class="cardgo">
+        <a class="btn ghost" href="https://experience.arcgis.com/experience/99f6d8062d3943c08aa7728d209060ff/page/Page?views=Making-of-the-Atlas" target="_blank" rel="noopener" title="The build story - how the whole Atlas was made">See how it all started &rarr;</a>
+        <a class="btn solid" id="home-exb" target="_blank" rel="noopener" title="Opens the ArcGIS Experience Builder app in a new tab.">Open the Experience &rarr;</a>
       </div>
     </div>
     <div class="card youarehere">
       <div class="half-h"><span class="badge cus">Custom &middot; you are here</span><h3 style="margin:0">Ask the Atlas</h3></div>
-      <p class="muted" style="margin:0 0 12px;font-size:13px">Question-first. A single custom page that reads the same
-      services through their REST endpoints and computes answers the configurable side cannot: nearest programs across
-      all four divisions, head-to-head comparisons, ad-hoc screening, ranked slates, strength of schedule.</p>
+      <p class="muted" style="margin:0 0 12px;font-size:13px">Question-first. Reads the same services through their REST
+      endpoints and computes answers configuration cannot: nearest programs across all four divisions, head-to-head
+      comparisons, ad-hoc screening, ranked slates, strength of schedule.</p>
       <ul class="road" style="font-size:12px">
         <li>One HTML file, no server, no API key, no build step</li>
-        <li>Client-side math on top of the published data - joins, distances, indexes</li>
+        <li>Client-side math on the published data - joins, distances, indexes</li>
         <li>Grows through the season as the services fill in</li>
       </ul>
-      <div style="margin-top:auto;padding-top:12px" class="tiny dim">Three surfaces, one data model. None of them replaces the others.</div>
+      <div style="margin-top:auto;padding-top:12px" class="tiny dim">Four surfaces, one data model. None of them replaces the others.</div>
     </div>
     <div class="card">
       <div class="half-h"><span class="badge post">Post-game</span><h3 style="margin:0">Tux&rsquo;s Take</h3></div>
       <p class="muted" style="margin:0 0 12px;font-size:13px">Result-first. This page scores what is worth watching
-      <b>before</b> kickoff. Tux&rsquo;s Take reads the same Atlas and writes what actually happened <b>after</b> -
-      final scores, quarter by quarter, an Aftermath Index and a recap in a beagle&rsquo;s voice.</p>
+      <b>before</b> kickoff. Tux&rsquo;s Take writes what happened <b>after</b> - final scores, quarter by quarter,
+      an Aftermath Index and a recap in a beagle&rsquo;s voice.</p>
       <ul class="road" style="font-size:12px">
-        <li>Every completed game on The Slate links straight to its recap</li>
-        <li>The Tux grade and the Aftermath Index are quoted here, never recomputed</li>
-        <li>Same <code>game_id</code> join key as everything else in the Atlas</li>
+        <li>Every completed game on The Slate links to its recap</li>
+        <li>The Tux grade and the Aftermath Index are quoted, never recomputed</li>
+        <li>Same <code>game_id</code> join key as the rest of the Atlas</li>
       </ul>
-      <div style="margin-top:auto;padding-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-        <a class="btn solid" style="display:inline-block;text-decoration:none" href="https://briankingery87.github.io/tuxs-take/" target="_blank" rel="noopener">Open Tux&rsquo;s Take &rarr;</a>
+      <div class="cardgo">
+        <a class="btn solid" id="home-tux" target="_blank" rel="noopener" title="Opens Tux&rsquo;s Take in a new tab.">Open Tux&rsquo;s Take &rarr;</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="half-h"><span class="badge film">Analytics</span><h3 style="margin:0">The Film Room</h3></div>
+      <p class="muted" style="margin:0 0 12px;font-size:13px">Relationship-first. Puts two different Atlas layers on the
+      same pair of axes and asks whether they have anything to do with each other. Does owning people win games? What
+      does the schedule cost?</p>
+      <ul class="road" style="font-size:12px">
+        <li>Six questions plus The Lab - plot anything against anything</li>
+        <li>Fourteen chart forms, all inline SVG, no chart library</li>
+        <li>Every correlation prints its <code>n</code> and stops at &ldquo;tendency&rdquo;</li>
+      </ul>
+      <div class="cardgo">
+        <a class="btn solid" id="home-film" target="_blank" rel="noopener" title="Opens The Film Room in a new tab.">Open The Film Room &rarr;</a>
       </div>
     </div>
   </div>
@@ -1609,7 +1635,7 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
         <div class="an"><b>Brian Kingery</b><span>, GISP, PMP</span></div>
         <div class="at">GIS Solutions Architect &nbsp;|&nbsp; Timmons Group</div>
         <p>Built nights and weekends with Claude, in ArcGIS Pro and ArcGIS Online, for zero dollars.
-        Every layer, popup, model and page across all three surfaces of the CFB Atlas came out of that loop.</p>
+        Every layer, popup, model and page across all four surfaces of the CFB Atlas came out of that loop.</p>
         <div class="al">
           <a href="https://www.linkedin.com/in/briankingery87/" target="_blank" rel="noopener">Connect on LinkedIn &rarr;</a>
           <span class="dim">|</span>
@@ -1625,7 +1651,7 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
   <div class="split">
     <div class="card">
       <h3>What Ask the Atlas is</h3>
-      <p class="muted" style="margin:0 0 10px">The CFB Atlas is three surfaces over one data model.
+      <p class="muted" style="margin:0 0 10px">The CFB Atlas is four surfaces over one data model.
       <b style="color:var(--ink)"><a href="https://bit.ly/CFB-Atlas" target="_blank" rel="noopener">The Experience</a></b> is the configurable one - ArcGIS Experience Builder, nine web maps,
       four dashboards, Arcade popups. You pick a view, toggle layers, click a feature. It is the right tool for exploring
       a theme and it is where the cartography lives.</p>
@@ -1636,8 +1662,13 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
       <p class="muted" style="margin:0 0 10px"><b style="color:var(--ink)"><a href="https://briankingery87.github.io/tuxs-take/" target="_blank" rel="noopener">Tux&rsquo;s Take</a></b>
       looks back. It holds the recap archive - final scores, an Aftermath Index and the writing - and this page reads two of
       its layers so a finished game on The Slate can show what it actually turned into and link to the full recap.</p>
+      <p class="muted" style="margin:0 0 10px"><b style="color:var(--ink)"><a href="https://briankingery87.github.io/film-room/" target="_blank" rel="noopener">The Film Room</a></b>
+      looks sideways. It puts two Atlas layers on the same pair of axes and asks whether they have anything to do with
+      each other - fourteen chart forms, every one of them inline SVG it draws itself, and every correlation printing
+      its own <code>n</code>.</p>
       <p class="muted" style="margin:0 0 14px">None of them replaces the others. The Experience answers "show me the fan
-      territory layer." Ask the Atlas answers "whose country do I live in." Tux&rsquo;s Take answers "what did I miss."</p>
+      territory layer." Ask the Atlas answers "whose country do I live in." Tux&rsquo;s Take answers "what did I miss."
+      The Film Room answers "are these two things related."</p>
       <div class="tiles" id="about-glance" style="margin-top:auto"></div>
     </div>
     <div class="card">
@@ -1769,8 +1800,10 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
     <div>
       <b>Ask the Atlas</b> is the custom half of the <b>CFB Atlas</b>, a college football data and mapping project
       covering all 666 NCAA programs across FBS, FCS, Division II and Division III. Built and maintained by Brian Kingery.
-      The configurable half lives in ArcGIS Experience Builder; the post-game half is
-      <a href="https://briankingery87.github.io/tuxs-take/" target="_blank" rel="noopener">Tux&rsquo;s Take</a>.
+      The configurable surface lives in ArcGIS Experience Builder; the post-game one is
+      <a href="https://briankingery87.github.io/tuxs-take/" target="_blank" rel="noopener">Tux&rsquo;s Take</a>
+      and the analytics one is
+      <a href="https://briankingery87.github.io/film-room/" target="_blank" rel="noopener">The Film Room</a>.
     </div>
     <div>
       <b>Data</b><br>
@@ -1821,9 +1854,13 @@ const SVC = {
   results:   ORG + 'CFB_Atlas_Recaps/FeatureServer/0',
   recaps:    ORG + 'CFB_Atlas_Recaps/FeatureServer/1'
 };
-/* The sibling apps. A game deep link is ?game=<CFBD game_id>, which Tux's Take
-   resolves to its own drawer - the join key is the same one used everywhere here. */
+/* THE FAMILY. Four surfaces over one data model, and every link to one of the
+   others resolves through a constant here so there is a single place to change
+   if any of them is ever republished.
+   A game deep link is ?game=<CFBD game_id>, which Tux's Take resolves to its own
+   drawer - the join key is the same one used everywhere in the Atlas. */
 const TUX = 'https://briankingery87.github.io/tuxs-take/';
+const FILM_URL = 'https://briankingery87.github.io/film-room/';
 const tuxGameUrl = gid => TUX + '?game=' + gid + '#aftermath';
 const ITEM = id => 'https://www.arcgis.com/home/item.html?id=' + id;
 /* The configurable half. This is the published short link, which is what gets
@@ -4096,7 +4133,9 @@ async function boot(){
      meant carrying a viewport-fitting routine, a blocked-frame fallback and a
      scroll-inside-a-scroll rule for a view that is better at full width in its own
      tab anyway. The home card links straight out to it now. */
-  $('#home-exb').href = EXB_URL;
+  $('#home-exb').href  = EXB_URL;
+  $('#home-tux').href  = TUX;
+  $('#home-film').href = FILM_URL;
 
   /* gauntlet wiring */
   typeahead('#q-g', '#hits-g', t=>{ GAUNT.team=t; drawGauntletTeam(); });

@@ -613,7 +613,35 @@ const feat = (attrs, geometry) => geometry ? { attributes:attrs, geometry } : { 
   out.nav_q       = await page.locator('nav.modes button em').count();
   out.foot_stamp  = (await page.textContent('#foot-stamp')).replace(/\s+/g,' ').trim();
 
-  out.tux_sibling_card = await page.locator('.split.three > .card').count();
+  /* four surfaces, four cards, and every launch button drawn the same way.
+     Home has to be the ACTIVE section first - every other mode is display:none,
+     so getBoundingClientRect would return zeros and an alignment check would
+     pass vacuously. */
+  await page.click('nav.modes button[data-mode="home"]');
+  await page.waitForTimeout(300);
+  out.sibling_cards   = await page.locator('.split.four > .card').count();          // 4
+  out.sibling_badges  = await page.locator('.split.four .half-h .badge').allTextContents();
+  out.launch_btns     = await page.evaluate(()=>
+    [...document.querySelectorAll('.split.four .cardgo a.btn')].map(a=>a.className + ' | ' + a.id));
+  out.launch_hrefs    = await page.evaluate(()=>
+    [...document.querySelectorAll('.split.four .cardgo a.btn[id]')].map(a=>a.id + '=' + a.href));
+  out.launch_hrefs    = await page.evaluate(()=>
+    [...document.querySelectorAll('.split.four .cardgo a.btn[id]')].map(a=>a.id + '=' + a.href));
+  /* Measured at 1600, where all four sit in ONE row - that is the case the
+     margin-top:auto rule exists for. At 1400 the grid is two rows and tops
+     differing by a row height is correct, not a bug. */
+  await page.setViewportSize({ width:1600, height:1000 });
+  await page.waitForTimeout(250);
+  await page.evaluate(()=> document.querySelector('.split.four').scrollIntoView({block:'center'}));
+  await page.waitForTimeout(200);
+  out.launch_same_row = await page.evaluate(()=>{
+    const tops = [...document.querySelectorAll('.split.four .cardgo a.btn.solid')]
+      .map(a=>Math.round(a.getBoundingClientRect().top));
+    return { tops, aligned: new Set(tops).size === 1 };
+  });
+  await page.locator('.split.four').screenshot({ path:'/home/claude/ata/shot-siblings.png' });
+  await page.setViewportSize({ width:1280, height:720 });
+  await page.waitForTimeout(200);
   // ---- the dossier shows the season with results ----
   await page.click('nav.modes button[data-mode="home"]');
   await page.waitForTimeout(250);
@@ -631,6 +659,19 @@ const feat = (attrs, geometry) => geometry ? { attributes:attrs, geometry } : { 
 
   out.rankings_pages = rankPages;      // must be > 1: the offset loop ran
   out.rankings_loaded = await page.evaluate(()=> DB.rankings.length);
+  /* four across on a wide screen, two at 1500 and under, one on a phone */
+  out.sibling_cols = {};
+  for (const w of [1600, 1400, 1100, 390]){
+    await page.setViewportSize({ width:w, height:900 });
+    await page.waitForTimeout(220);
+    out.sibling_cols[w] = await page.evaluate(()=>{
+      const g = document.querySelector('.split.four');
+      return getComputedStyle(g).gridTemplateColumns.split(' ').length;
+    });
+  }
+  await page.setViewportSize({ width:1280, height:720 });
+  await page.waitForTimeout(220);
+
   out.gamesThisWeek_reads = gtwHits;   // must be 0
   /* ---------------------------------------------------------------------
      NO BRITISH SPELLING. BK asked for American throughout.
