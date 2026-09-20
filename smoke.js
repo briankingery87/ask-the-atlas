@@ -2,6 +2,8 @@
    Verifies that all four modes render without JS errors and that placeholder
    handling, sorting, scoring and the drawer all behave. */
 const { chromium } = require('playwright');
+const fs = require('fs');
+const path = require('path');
 
 const mkTeam = (o) => Object.assign({
   team_id:1, school:'Test', mascot:'Testers', abbreviation:'TST', conference:'Big Ten', division:'FBS',
@@ -630,6 +632,74 @@ const feat = (attrs, geometry) => geometry ? { attributes:attrs, geometry } : { 
   out.rankings_pages = rankPages;      // must be > 1: the offset loop ran
   out.rankings_loaded = await page.evaluate(()=> DB.rankings.length);
   out.gamesThisWeek_reads = gtwHits;   // must be 0
+  /* ---------------------------------------------------------------------
+     NO BRITISH SPELLING. BK asked for American throughout.
+
+     This scans the SOURCE TEMPLATE, not the rendered page, and that is a
+     deliberate choice rather than a shortcut:
+
+       - The source is the only place authored prose lives. Scanning it catches
+         code comments and tooltip strings that never render until someone hovers
+         the right element, which is precisely where "normalised" and "LABELLED"
+         survived the last three reviews.
+       - The rendered page is full of DATA, and the data is not ours to police.
+         "Centre College Kentucky" is a real D3 program in the Teams layer, and
+         four schools play as the Greyhounds. A guard that reads document.textContent
+         fails on those the moment a screener filter or a typeahead happens to show
+         one - and a guard that cries wolf gets deleted.
+
+     Keep each entry a whole word. Do not add "flat" (a CSS class and a normal
+     English adjective) or "sport" (used correctly in the singular here). */
+  const BRITISH = [
+    'colour','colours','coloured','colourful','behaviour','behaviours','favour','favours',
+    'favourite','favourites','favoured','honour','honours','labour','neighbour','neighbours',
+    'rumour','harbour','flavour','humour','endeavour','armour','parlour','saviour','vigour',
+    'normalise','normalises','normalised','normalising','normalisation',
+    'organise','organises','organised','organising','organisation',
+    'recognise','recognises','recognised','recognising',
+    'realise','realises','realised','realising',
+    'analyse','analyses','analysed','analysing','paralyse','catalyse',
+    'summarise','summarised','prioritise','prioritised','utilise','utilised',
+    'minimise','minimised','maximise','maximised','optimise','optimised',
+    'customise','customised','standardise','standardised','initialise','initialised',
+    'serialise','serialised','visualise','visualised','categorise','categorised',
+    'characterise','characterised','emphasise','emphasised','specialise','specialised',
+    'generalise','generalised','authorise','authorised','centralise','centralised',
+    'capitalise','capitalised','finalise','finalised','localise','localised',
+    'rationalise','rationalised','randomise','randomised','itemise','itemised',
+    'apologise','apologised','criticise','criticised','sanitise','sanitised',
+    'synchronise','synchronised','stabilise','stabilised','penalise','penalised',
+    'centre','centres','centred','centring','metre','metres','litre','litres',
+    'theatre','theatres','fibre','fibres','calibre','sombre','spectre','lustre','manoeuvre',
+    'defence','offence','pretence','licence','practise','practised','practising',
+    'labelled','labelling','modelled','modelling','travelled','travelling','traveller',
+    'cancelled','cancelling','signalled','signalling','totalled','totalling',
+    'fuelled','fuelling','levelled','levelling','channelled','funnelled','equalled',
+    'counsellor','counselled','jewellery','woollen','programme','programmes',
+    'enrol','enrolment','fulfil','fulfilment','instalment','skilful','wilful',
+    'catalogue','catalogues','dialogue','dialogues','analogue','monologue',
+    'grey','greyed','greying','aluminium','aeroplane','draught','kerb','plough',
+    'sceptical','scepticism','storey','storeys','tyre','tyres','cheque','cheques',
+    'mould','moustache','pyjamas','sulphur','artefact','artefacts','ageing',
+    'encyclopaedia','mediaeval','foetus','orientated','acclimatise',
+    'learnt','spelt','burnt','dreamt','leapt','spoilt','smelt','knelt',
+    'towards','amongst','whilst','anticlockwise','maths','forwards','backwards',
+    'upwards','downwards','afterwards','fortnight','lorry','postcode','rubbish',
+    'per cent','car park','in hospital','at university'
+  ];
+  const britRe = new RegExp('\\b(' + BRITISH.join('|') + ')\\b', 'ig');
+  const britSrc = fs.readFileSync(path.resolve(__dirname, 'src', 'app.template.html'), 'utf8');
+  const britHits = [];
+  britSrc.split('\n').forEach((line, i) => {
+    if (line.includes('base64,') && line.length > 400) return;   // image payloads
+    let m;
+    britRe.lastIndex = 0;
+    while ((m = britRe.exec(line)) !== null){
+      britHits.push('line ' + (i+1) + ': ' + m[0] + '  ->  ' + line.trim().slice(0, 70));
+    }
+  });
+  out.british_spelling = britHits.length ? britHits.slice(0, 12) : 'clean';
+
   out.pageerrors = errors;
   out.console_errors = console_errors.filter(t => !/net::ERR|Failed to load resource/.test(t));
 

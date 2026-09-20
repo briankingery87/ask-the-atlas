@@ -819,7 +819,7 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
         <option value="easy">Sort: Softest schedule</option>
         <option value="ranked">Sort: Most ranked opponents</option>
         <option value="road">Sort: Most true road games</option>
-        <option value="miles">Sort: Most miles travelled</option>
+        <option value="miles">Sort: Most miles traveled</option>
       </select>
       <span class="tiny dim" id="g-count"></span>
     </div>
@@ -1069,7 +1069,7 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
       for anything else built on this data model.</p>
       <ul class="road" style="max-width:96ch">
       <li><b>Place-first entry.</b> "What does college football look like where I live" is the question the county gravity model uniquely answers, and it needs to be one search box rather than three layers assembled by hand.</li>
-      <li><b>Cross-division nearest-neighbour.</b> D2 and D3 are reference-only in the tiering rule, which makes 397 rows look like filler. Distance-from-me is the context where a D3 school twelve miles away beats an SEC school four hundred miles away.</li>
+      <li><b>Cross-division nearest-neighbor.</b> D2 and D3 are reference-only in the tiering rule, which makes 397 rows look like filler. Distance-from-me is the context where a D3 school twelve miles away beats an SEC school four hundred miles away.</li>
       <li><b>Ad-hoc query as a first-class view.</b> Dashboards answer questions you anticipated. A screener answers the ones you did not, and the presets are the part people share.</li>
       <li><b>Score, then show the score's working.</b> Any composite index should publish its components, its weights and its denominator on the same screen as the number.</li>
       <li><b>Degrade loudly.</b> Rigorous placeholder handling is invisible when it works. Surfacing it as a live panel turns a data gap into a credibility signal.</li>
@@ -1083,7 +1083,7 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
       <ul class="road">
         <li><b>Results and records</b> - the schedule table carries scores and a completed flag. Week 1 flips them on, and the Gauntlet turns from a preview into a running tally.</li>
         <li><b>Poll history</b> - every release of all five polls is in the table and the home strip can page back through them, but nothing yet charts a team's week-to-week movement. Biggest risers and fallers is the obvious next cut.</li>
-        <li><b>SP+, Elo and SRS</b> - the Ratings table already has the columns; CFBD has not filled them for 2026. The Tale of the Tape has the rows waiting and greyed.</li>
+        <li><b>SP+, Elo and SRS</b> - the Ratings table already has the columns; CFBD has not filled them for 2026. The Tale of the Tape has the rows waiting and grayed.</li>
         <li><b>Recruiting</b> - 3,051 mapped commits and 2,139 origin-destination flows are published and unused here so far. A "where does the talent come from" page is the obvious next question.</li>
         <li><b>The Rewind</b> - a Sunday-morning counterpart to the Slate: what actually happened, biggest upsets against the line, and which counties changed hands.</li>
       </ul>
@@ -1356,7 +1356,7 @@ function vizColor(hex){
   const base = (hex[0]==='#' ? hex : '#'+hex).toUpperCase();
   if (ratio(base, PANEL) >= 2.2) return base;
   /* multiply the channels first - that keeps the hue exactly (Michigan navy
-     becomes a brighter blue, not grey). Only fall back to a white blend when
+     becomes a brighter blue, not gray). Only fall back to a white blend when
      multiplying clips out, which happens on colors that are already light. */
   for (let k=1.2; k<=9; k+=0.2){
     const c = scaleRGB(base, k);
@@ -1529,7 +1529,7 @@ async function loadAll(){
     rec.forEach(r => {
       const cur = byId.get(r.game_id) || { game_id:r.game_id };
       /* "N/A" is a real value in tux_grade - three week-1 rows carry it - so it is
-         normalised to absent here rather than printed as a grade of N/A */
+         normalized to absent here rather than printed as a grade of N/A */
       cur.headline = has(r.headline) ? r.headline : null;
       cur.money_line = has(r.money_line) ? r.money_line : null;
       cur.angle = has(r.angle) ? r.angle : null;
@@ -1592,7 +1592,7 @@ function currentWeek(){
    and III. A team appears in exactly one of them, so a #1 in the D2 poll is not a
    national #1. Left unhandled that team would show a bare "1" pill and score the
    same star power as the best team in the country. Every rank is therefore
-   LABELLED with its poll and WEIGHTED by its scope. */
+   LABELED with its poll and WEIGHTED by its scope. */
 const POLL_TIERS = [
   { test:/^ap\b/i,                  abbr:'AP',  short:'AP Top 25',        weight:1.00 },
   { test:/^coaches/i,               abbr:'CO',  short:'Coaches Poll',     weight:1.00 },
@@ -1891,7 +1891,7 @@ function renderNearbyGames(lat, lon){
 const TAPE = { a:null, b:null, map:null, gen:0 };
 
 /* every metric declares its own availability, direction and formatter.
-   A metric with a placeholder on either side is rendered greyed and never scored. */
+   A metric with a placeholder on either side is rendered grayed and never scored. */
 /* Plain-English definitions. These go on the row tooltip and into the glossary
    under the tape, because "SP+ -" tells a reader nothing about what is missing. */
 const METRIC_DEF = {
@@ -1983,13 +1983,13 @@ function renderTape(){
 
   '<div class="tape-body">' +
     '<div class="card"><h3>The tape <span>hover any row for what the metric means</span></h3><div id="duels"></div>' +
-      '<div class="explainer"><div class="ex-title">Greyed rows, and what they are waiting on</div>' +
+      '<div class="explainer"><div class="ex-title">Grayed rows, and what they are waiting on</div>' +
       '<div class="ex-cols">' +
       '<div><b>SP+, Elo, SRS</b> are opponent-adjusted team ratings. The Ratings table has all three columns published and ' +
       'empty - the source has not released 2026 values yet. They fill in on their own during the season; nothing here needs changing.</div>' +
       '<div><b>Talent composite</b> is the recruiting rating of the whole roster. Also published-but-empty for 2026.</div>' +
       '<div><b>FPI</b> is live now, for the 137 FBS programs it covers. FCS, D2 and D3 have no published rating from any source, ' +
-      'which is why those rows grey out on a cross-division matchup rather than scoring the FBS side a free point.</div>' +
+      'which is why those rows gray out on a cross-division matchup rather than scoring the FBS side a free point.</div>' +
       '</div></div></div>' +
     '<div>' +
       '<div class="card"><h3>Five seasons <span>win pct</span></h3><div id="spark"></div></div>' +
@@ -2107,7 +2107,7 @@ const COLS = [
   { k:'_surface', lab:'Field', t:'s', tip:'Roof and playing surface - Open or Dome, Grass or Turf.' },
   { k:'fpi', lab:'FPI', t:'n', dec:1, tip:'ESPN Football Power Index: team strength on a points-per-game scale where 0 is an average FBS team. FBS only.' },
   { k:'recruiting_rank', lab:'Recr #', t:'n', tip:'National rank of the 2026 recruiting class. Lower is better.' },
-  { k:'travel_gc_miles', lab:'Road mi', t:'n', tip:'Total great-circle miles travelled across the season, one way.' },
+  { k:'travel_gc_miles', lab:'Road mi', t:'n', tip:'Total great-circle miles traveled across the season, one way.' },
   { k:'_emppop', lab:'Empire pop', t:'n', tip:'People living in the counties the gravity model assigns to this program.' },
   { k:'_empcty', lab:'Emp cty', t:'n', tip:'Number of counties the program holds outright.' },
   { k:'record_2025', lab:'2025', t:'s', tip:'Final 2025 record.' },
@@ -2456,7 +2456,7 @@ function buildLineIndex(){
   });
   return best;
 }
-/* Normalise a schedule row into the shape the cards already speak, so the
+/* Normalize a schedule row into the shape the cards already speak, so the
    renderer, the filters and the watchability index all work unchanged. */
 function slateRow(g, lines){
   const h = DB.byId.get(g.home_id), a = DB.byId.get(g.away_id);
@@ -2508,7 +2508,7 @@ function buildRecords(){
     if (isFinite(g.away_id)) { const r = slot(g.away_id); if (ap>hp) r.w++; else if (ap<hp) r.l++; else r.t++; }
   });
 }
-/* One record string per team, labelled by which season it describes. Showing last
+/* One record string per team, labeled by which season it describes. Showing last
    season's record with no label - which is what this page used to do - reads as the
    current one to anyone who does not know the field name. */
 function recordOf(id, rec25){

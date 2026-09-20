@@ -107,7 +107,7 @@ python -m http.server 8000
 
 ## Editing it
 
-Everything is in `index.html`, in labelled sections:
+Everything is in `index.html`, in labeled sections:
 
 ```
 0 config     service URLs, field lists, the service catalog
