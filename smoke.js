@@ -376,24 +376,38 @@ const feat = (attrs, geometry) => geometry ? { attributes:attrs, geometry } : { 
            ' zoom='+z+' center='+(c?c.lat.toFixed(2)+','+c.lng.toFixed(2):'-');
   });
 
-  // --- EXPERIENCE (lazy iframe must NOT load until asked)
-  await page.click('nav.modes button[data-mode="experience"]');
-  await page.waitForTimeout(300);
-  out.exb_autoloaded = await page.locator('#exb-holder iframe').count();
-  out.exb_no_picker = await page.locator('#exb-view').count();
+  /* --- THE EXPERIENCE now lives outside the app. There is no tab, no iframe and
+     no viewport-fitting routine left; the home card links straight out to the
+     published short link, and nothing anywhere should still route to a mode that
+     does not exist. */
+  await page.click('nav.modes button[data-mode="home"]');
+  await page.waitForTimeout(250);
+  out.exb_tab      = await page.locator('nav.modes button[data-mode="experience"]').count();   // 0
+  out.exb_section  = await page.locator('#m-experience').count();                              // 0
+  out.exb_iframe   = await page.locator('iframe').count();                                     // 0
+  out.exb_href     = await page.getAttribute('#home-exb','href');
+  out.exb_target   = await page.getAttribute('#home-exb','target');
+  out.exb_goto     = await page.locator('[data-goto="experience"]').count();                   // 0
+  out.exb_about_link = await page.getAttribute('#m-about a[href*="bit.ly"]','href').catch(()=>'none');
+  /* A stale #experience bookmark must land on home rather than on a page with
+     every section hidden. This has to be a COLD LOAD - the guard runs in boot(),
+     so setting the hash on an already-open page proves nothing. */
+  /* about:blank first - a goto that differs only by fragment is a same-document
+     navigation, so the page would never reload and boot() would never re-run */
+  await page.goto('about:blank');
+  await page.goto('file:///home/claude/ata/index.html#experience');
+  await page.waitForFunction(() => document.querySelector('#loadstate').textContent.includes('programs'), { timeout:15000 });
   await page.waitForTimeout(400);
-  out.exb = await page.evaluate(()=>{
-    const h = document.querySelector('#exb-holder');
-    const r = h.getBoundingClientRect();
-    return {
-      holderH: Math.round(r.height),
-      holderBottom: Math.round(r.bottom),
-      viewportH: window.innerHeight,
-      pageScrolls: document.documentElement.scrollHeight > window.innerHeight + 2,
-      overshootPx: Math.round(document.documentElement.scrollHeight - window.innerHeight),
-      footerHidden: getComputedStyle(document.querySelector('footer.foot')).display === 'none'
-    };
-  });
+  await page.waitForTimeout(1200);
+  out.exb_stale_hash = await page.evaluate(()=>({
+    sectionsOn: [...document.querySelectorAll('section.mode.on')].map(s=>s.id),
+    hash: location.hash,
+    homeTab: document.querySelector('nav.modes button[data-mode="home"]').getAttribute('aria-selected')
+  }));
+  await page.goto('about:blank');
+  await page.goto('file:///home/claude/ata/index.html');
+  await page.waitForFunction(() => document.querySelector('#loadstate').textContent.includes('programs'), { timeout:15000 });
+  await page.waitForTimeout(400);
   out.youarehere_border = await page.evaluate(()=>{
     const c = document.querySelector('.card.youarehere'); if(!c) return 'missing';
     return getComputedStyle(c).borderTopColor;

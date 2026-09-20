@@ -746,12 +746,7 @@ nav.modes button[aria-selected="true"] em{opacity:.75}
 .loadstate b{color:var(--cyan);font-weight:700}
 
 main{max-width:1560px;margin:0 auto;padding:18px}
-main:has(#m-experience.on){max-width:none}
 section.mode.wide .card{border-radius:10px}
-/* on the Experience tab the page is sized to the viewport, so the only scrollbar
-   is the embedded app's own - no scroll-inside-a-scroll */
-body.exb-fit footer.foot{display:none}
-body.exb-fit main{padding-bottom:0}
 section.mode{display:none}
 section.mode.on{display:block}
 
@@ -1202,7 +1197,6 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
   .slate-map .mapbox{height:300px;flex:0 0 auto}
   .drawer{width:100%}
   footer.foot > div{grid-template-columns:1fr !important;gap:14px}
-  #exb-holder{height:58vh;min-height:380px}
 }
 
 /* ---------- phone ---------- */
@@ -1240,7 +1234,6 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
   .svcrow{gap:8px}
   .endpoint a{font-size:10px}
   .drawer .db{padding:13px}
-  #exb-holder{height:56vh;min-height:340px}
 }
 </style>
 </head>
@@ -1262,7 +1255,6 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
       <button role="tab" data-mode="gauntlet" aria-selected="false"><em>Q3.</em> The Gauntlet</button>
       <button role="tab" data-mode="screener" aria-selected="false"><em>Q4.</em> The Screener</button>
       <button role="tab" data-mode="slate" aria-selected="false"><em>Q5.</em> The Slate</button>
-      <button role="tab" data-mode="experience" aria-selected="false">The Experience</button>
       <button role="tab" data-mode="about" aria-selected="false">Under the Hood</button>
     </nav>
     <div class="loadstate" id="loadstate">Connecting<b>&hellip;</b></div>
@@ -1301,7 +1293,8 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
     <div class="card">
       <div class="half-h"><span class="badge cfg">Configurable</span><h3 style="margin:0">The CFB Atlas Experience</h3></div>
       <p class="muted" style="margin:0 0 12px;font-size:13px">Layer-first. Built in ArcGIS Experience Builder from the same
-      services: pick a view, turn layers on, click a feature, read the popup. It is the place to <b>explore</b> -
+      services: pick a view, turn layers on, click a feature, read the popup. Opens in its own tab, at full size.
+      It is the place to <b>explore</b> -
       fan territories, empires, recruiting flows, travel demand, the Top 25, the core map with everything on it.</p>
       <ul class="road" style="font-size:12px">
         <li>Nine web maps and four dashboards, all authored, all configurable</li>
@@ -1309,7 +1302,7 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
         <li>Changes are made by configuration, not code</li>
       </ul>
       <div style="margin-top:auto;padding-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn" data-goto="experience">Open the Experience &rarr;</button>
+        <a class="btn" id="home-exb" style="display:inline-block;text-decoration:none" target="_blank" rel="noopener" title="Opens the ArcGIS Experience Builder app in a new tab.">Open the Experience &rarr;</a>
         <a class="btn ghost" style="display:inline-block;text-decoration:none" href="https://experience.arcgis.com/experience/99f6d8062d3943c08aa7728d209060ff/page/Page?views=Making-of-the-Atlas" target="_blank" rel="noopener" title="The build story - how the whole Atlas was made">See how it all started &rarr;</a>
       </div>
     </div>
@@ -1605,26 +1598,6 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
   <div class="slate-grid" id="slate-grid"></div>
 </section>
 
-<!-- ============================ THE EXPERIENCE ============================ -->
-<section class="mode wide" id="m-experience">
-  <div class="card" style="margin-bottom:10px;padding:12px 16px">
-    <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
-      <div style="flex:1 1 420px;min-width:280px">
-        <div class="eyebrow" style="margin-bottom:4px">The other half &middot; configurable</div>
-        <div class="hero" style="font-size:22px">The CFB Atlas Experience</div>
-        <div class="sub">Layer-first exploration, built in ArcGIS Experience Builder from the same services this page reads.
-        It runs below with its own full navigation.</div>
-      </div>
-      <div style="flex:0 0 auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <a class="btn solid" style="text-decoration:none" href="https://experience.arcgis.com/experience/99f6d8062d3943c08aa7728d209060ff/" target="_blank" rel="noopener">Open full screen in a new tab &rarr;</a>
-      </div>
-    </div>
-  </div>
-  <div class="card" style="padding:0;overflow:hidden">
-    <div id="exb-holder" style="height:60vh;min-height:420px;position:relative"></div>
-  </div>
-</section>
-
 <!-- ============================ ABOUT ============================ -->
 <section class="mode" id="m-about">
 
@@ -1653,7 +1626,7 @@ table.meth td.w{text-align:right;font-variant-numeric:tabular-nums;color:var(--c
     <div class="card">
       <h3>What Ask the Atlas is</h3>
       <p class="muted" style="margin:0 0 10px">The CFB Atlas is three surfaces over one data model.
-      <b style="color:var(--ink)">The Experience</b> is the configurable one - ArcGIS Experience Builder, nine web maps,
+      <b style="color:var(--ink)"><a href="https://bit.ly/CFB-Atlas" target="_blank" rel="noopener">The Experience</a></b> is the configurable one - ArcGIS Experience Builder, nine web maps,
       four dashboards, Arcade popups. You pick a view, toggle layers, click a feature. It is the right tool for exploring
       a theme and it is where the cartography lives.</p>
       <p class="muted" style="margin:0 0 10px"><b style="color:var(--ink)">Ask the Atlas</b> is the custom one, and it looks
@@ -1853,6 +1826,11 @@ const SVC = {
 const TUX = 'https://briankingery87.github.io/tuxs-take/';
 const tuxGameUrl = gid => TUX + '?game=' + gid + '#aftermath';
 const ITEM = id => 'https://www.arcgis.com/home/item.html?id=' + id;
+/* The configurable half. This is the published short link, which is what gets
+   handed out on slides and in print - it redirects to the Experience Builder app.
+   Everything on this page that sends a reader there uses it, so there is one URL
+   to change if the app is ever republished. */
+const EXB_URL = 'https://bit.ly/CFB-Atlas';
 /* Documented for the Under the Hood table: every layer this page touches,
    what it represents, and where to go to read the item's own metadata. */
 const SERVICE_DOCS = [
@@ -4023,8 +4001,6 @@ function setMode(m){
   if (m==='tape') inv(TAPE.map);
   if (m==='gauntlet') inv(GAUNT.map);
   if (m==='home') inv(pollMap);
-  document.body.classList.toggle('exb-fit', m==='experience');
-  if (m==='experience' && window.__loadExb){ window.__loadExb(); sizeExb(); }
   setTimeout(()=> wakeLazyImages($('#m-'+m)), 80);
   location.hash = m;
 }
@@ -4047,22 +4023,9 @@ function typeahead(inputSel, listSel, onPick){
   });
 }
 
-/* Give the embed every pixel left below the intro card, and not one more, so the
-   outer page has nothing to scroll. Recomputed on resize and orientation change. */
-function sizeExb(){
-  const h = $('#exb-holder'); if (!h) return;
-  requestAnimationFrame(()=>{
-    const top = h.getBoundingClientRect().top + window.scrollY;
-    const avail = Math.max(360, window.innerHeight - top - 14);
-    h.style.height = avail + 'px';
-    h.style.minHeight = '0';
-  });
-}
-
 const LIVE_MAPS = ()=> [mapT, slMap, TAPE.map, GAUNT.map, pollMap].filter(Boolean);
 let rsz;
-window.addEventListener('resize', ()=>{ clearTimeout(rsz); rsz = setTimeout(()=>{ LIVE_MAPS().forEach(refit);
-  if (document.body.classList.contains('exb-fit')) sizeExb(); }, 180); });
+window.addEventListener('resize', ()=>{ clearTimeout(rsz); rsz = setTimeout(()=> LIVE_MAPS().forEach(refit), 180); });
 let scr;
 window.addEventListener('scroll', ()=>{ clearTimeout(scr); scr = setTimeout(()=> wakeLazyImages(), 140); }, { passive:true });
 document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState === 'visible') wakeLazyImages(); });
@@ -4129,38 +4092,11 @@ async function boot(){
     if (isFinite(t.latitude)) setPoint(t.latitude + (Math.random()-.5)*1.4, t.longitude + (Math.random()-.5)*1.8, 'Near ' + t.school);
   };
 
-  /* the Experience. It mounts on first visit to the tab rather than on page load,
-     so the landing page stays fast, but the visitor never has to press anything. */
-  const EXB = 'https://experience.arcgis.com/experience/99f6d8062d3943c08aa7728d209060ff/';
-  const exbUrl = ()=> EXB;
-  let exbMounted = false;
-  function loadExb(){
-    if (exbMounted) return;
-    exbMounted = true;
-    const h = $('#exb-holder');
-    h.innerHTML = '<div id="exb-spin" style="position:absolute;inset:0;display:grid;place-items:center;pointer-events:none">' +
-      '<div class="tiny dim">Mounting the Experience&hellip; it is a large app, give it a few seconds.</div></div>' +
-      '<iframe id="exb-frame" src="'+exbUrl()+'" title="CFB Atlas Experience" ' +
-      'style="width:100%;height:100%;border:0;display:block" allowfullscreen></iframe>';
-    const fr = $('#exb-frame');
-    let ok = false;
-    fr.onload = ()=>{ ok = true; const sp = $('#exb-spin'); if (sp) sp.remove(); };
-    setTimeout(()=>{ const sp = $('#exb-spin'); if (sp && ok) sp.remove(); }, 3000);
-    /* Verified 2026-08-14: experience.arcgis.com sends no X-Frame-Options and no CSP
-       frame-ancestors, so this embeds. If Esri ever changes that, say so plainly
-       rather than leaving a blank rectangle. */
-    setTimeout(()=>{
-      if (ok) return;
-      const sp = $('#exb-spin'); if (!sp) return;
-      sp.style.pointerEvents = 'auto';
-      sp.innerHTML = '<div style="text-align:center;padding:24px;background:rgba(10,30,49,.94);border-radius:10px;max-width:46ch">' +
-        '<div style="font-weight:900;margin-bottom:6px">Still loading, or your browser blocked the embed.</div>' +
-        '<div class="muted tiny" style="margin-bottom:12px">The Experience is a heavy ArcGIS app and some networks or ' +
-        'privacy extensions refuse third-party frames. Opening it in its own tab always works.</div>' +
-        '<a class="btn solid" style="text-decoration:none" href="' + exbUrl() + '" target="_blank" rel="noopener">Open it in a new tab &rarr;</a></div>';
-    }, 14000);
-  }
-  window.__loadExb = loadExb;
+  /* The Experience is no longer embedded. It was an iframe on its own tab, which
+     meant carrying a viewport-fitting routine, a blocked-frame fallback and a
+     scroll-inside-a-scroll rule for a view that is better at full width in its own
+     tab anyway. The home card links straight out to it now. */
+  $('#home-exb').href = EXB_URL;
 
   /* gauntlet wiring */
   typeahead('#q-g', '#hits-g', t=>{ GAUNT.team=t; drawGauntletTeam(); });
@@ -4242,7 +4178,11 @@ async function boot(){
   if (topSos){ GAUNT.team = DB.byId.get(topSos.team_id); $('#q-g').value = GAUNT.team.school; drawGauntletTeam(); }
 
   const h = location.hash.replace('#','');
+  /* #experience was a real tab until the Experience moved out to its own link, so
+     an old bookmark still arrives here. Land it on home and clear the hash rather
+     than leaving an address that points at nothing. */
   if (['home','turf','tape','gauntlet','screener','slate','about'].includes(h)) setMode(h);
+  else if (h) setMode('home');
 }
 boot();
 </script>
